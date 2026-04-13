@@ -24,12 +24,8 @@ As a university student, it is easy to lose track of assignments and deadlines a
 
 ## Build and run
 
-Instructions will be added after the initial implementation.
+## Build and run
 
-## Screenshot
-
-To be added.
-
-## Live demo
-
-To be added.
+```bash
+dotnet build
+dotnet run
