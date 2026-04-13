@@ -1,59 +1,169 @@
-namespace StudyFlowApp
+module StudyFlowApp.Client
 
 open WebSharper
-open WebSharper.JavaScript
 open WebSharper.UI
 open WebSharper.UI.Client
-open WebSharper.UI.Templating
+open WebSharper.UI.Html
 
 [<JavaScript>]
-module Client =
-    // The templates are loaded from the DOM, so you just can edit index.html
-    // and refresh your browser, no need to recompile unless you add or remove holes.
-    type IndexTemplate = Template<"wwwroot/index.html", ClientLoad.FromDocument>
+type Priority =
+    | Low
+    | Medium
+    | High
 
-    let People =
-        ListModel.FromSeq [
-            "John"
-            "Paul"
+[<JavaScript>]
+type StudyTask =
+    {
+        Id: int
+        Title: string
+        Subject: string
+        Priority: Priority
+        IsDone: bool
+    }
+
+[<JavaScript>]
+let priorityToString p =
+    match p with
+    | Low -> "Low"
+    | Medium -> "Medium"
+    | High -> "High"
+
+[<JavaScript; SPAEntryPoint>]
+let Main () =
+    let titleVar = Var.Create ""
+    let subjectVar = Var.Create ""
+    let priorityVar = Var.Create Medium
+
+    let nextIdVar = Var.Create 3
+
+    let tasksVar =
+        Var.Create [
+            {
+                Id = 1
+                Title = "Math homework"
+                Subject = "Mathematics"
+                Priority = High
+                IsDone = false
+            }
+            {
+                Id = 2
+                Title = "F# assignment"
+                Subject = "Functional Programming"
+                Priority = Medium
+                IsDone = false
+            }
         ]
 
+    let addTask () =
+        let title = titleVar.Value.Trim()
+        let subject = subjectVar.Value.Trim()
+        let priority = priorityVar.Value
 
-[<SPAEntryPoint>]
-let Main () =
+        if title <> "" && subject <> "" then
+            let newTask =
+                {
+                    Id = nextIdVar.Value
+                    Title = title
+                    Subject = subject
+                    Priority = priority
+                    IsDone = false
+                }
 
-    let input = ref ""
+            tasksVar.Value <- tasksVar.Value @ [ newTask ]
+            nextIdVar.Value <- nextIdVar.Value + 1
+            titleVar.Value <- ""
+            subjectVar.Value <- ""
+            priorityVar.Value <- Medium
 
-    let tasks = ref [
-        "Math homework"
-        "F# assignment"
-    ]
+    let toggleTask taskId =
+        tasksVar.Value <-
+            tasksVar.Value
+            |> List.map (fun t ->
+                if t.Id = taskId then
+                    { t with IsDone = not t.IsDone }
+                else
+                    t
+            )
 
-    let render () =
+    let deleteTask taskId =
+        tasksVar.Value <-
+            tasksVar.Value
+            |> List.filter (fun t -> t.Id <> taskId)
+
+    let priorityButton label value =
+        button [
+            on.click (fun _ _ -> priorityVar.Value <- value)
+            attr.style (
+                if priorityVar.Value = value then
+                    "margin-right: 6px; font-weight: bold;"
+                else
+                    "margin-right: 6px;"
+            )
+        ] [ text label ]
+
+    div [] [
+        h1 [] [ text "StudyFlow" ]
+
+        h3 [] [ text "Add new task" ]
+
+        div [ attr.style "margin-bottom: 6px;" ] [
+            Doc.InputType.Text [ attr.placeholder "Task title" ] titleVar
+        ]
+
+        div [ attr.style "margin-bottom: 6px;" ] [
+            Doc.InputType.Text [ attr.placeholder "Subject" ] subjectVar
+        ]
+
+        div [ attr.style "margin-bottom: 6px;" ] [
+            text "Priority: "
+            priorityButton "Low" Low
+            priorityButton "Medium" Medium
+            priorityButton "High" High
+        ]
+
+        div [ attr.style "margin-bottom: 10px;" ] [
+            text ("Selected priority: " + priorityToString priorityVar.Value)
+        ]
+
+        div [ attr.style "margin-bottom: 20px;" ] [
+            button [
+                on.click (fun _ _ -> addTask ())
+            ] [ text "Add" ]
+        ]
+
+        h3 [] [ text "Task list" ]
+
         div [] [
+            tasksVar.View
+            |> Doc.BindView (fun tasks ->
+                tasks
+                |> List.map (fun t ->
+                    div [ attr.style "margin-bottom: 10px;" ] [
+                        span [
+                            attr.style (
+                                if t.IsDone then "text-decoration: line-through; margin-right: 10px;"
+                                else "margin-right: 10px;"
+                            )
+                        ] [
+                            text (t.Title + " | " + t.Subject + " | " + priorityToString t.Priority)
+                        ]
 
-            h1 [] [text "StudyFlow"]
+                        button [
+                            on.click (fun _ _ -> toggleTask t.Id)
+                            attr.style "margin-right: 6px;"
+                        ] [
+                            text (if t.IsDone then "Undo" else "Done")
+                        ]
 
-            div [] [
-                input [
-                    attr.value !input
-                    on.input (fun e -> input := e.Value)
-                ]
-
-                button [
-                    on.click (fun _ ->
-                        if !input <> "" then
-                            tasks := !tasks @ [!input]
-                            input := ""
-                            render() |> ignore
-                    )
-                ] [text "Add"]
-            ]
-
-            ul [] (
-                !tasks
-                |> List.map (fun t -> li [] [text t])
+                        button [
+                            on.click (fun _ _ -> deleteTask t.Id)
+                        ] [
+                            text "Delete"
+                        ]
+                    ]
+                )
+                |> Doc.Concat
             )
         ]
-
-    render() |> ignore
+    ]
+    |> Doc.RunById "main"
