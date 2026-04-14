@@ -22,12 +22,12 @@ As a university student, it is easy to lose track of assignments and deadlines a
 - .NET
 - WebSharper / SPA approach
 
+## Screenshot
+
+![StudyFlow Screenshot](Screenshot.png)
+
 ## Build and run
 
 ```bash
 dotnet build
 dotnet run
-
-## Screenshot
-
-![StudyFlow Screenshot](Screenshot.png)
