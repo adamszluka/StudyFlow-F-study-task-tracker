@@ -24,8 +24,10 @@ As a university student, it is easy to lose track of assignments and deadlines a
 
 ## Build and run
 
-## Build and run
-
 ```bash
 dotnet build
 dotnet run
+
+## Screenshot
+
+![StudyFlow Screenshot](Screenshot.png)
