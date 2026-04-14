@@ -11,23 +11,27 @@ function Main(){
   const filterVar=_c.Create_1(All);
   const nextIdVar=_c.Create_1(3);
   const tasksVar=_c.Create_1(ofArray([New(1, "Math homework", "Mathematics", High, false), New(2, "F# assignment", "Functional Programming", Medium, false)]));
-  const priorityButtons=Doc.BindView((currentPriority) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.TextNode("Priority: "), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(Low)), Attr.Create("style", currentPriority.$===0?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("Low")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(Medium)), Attr.Create("style", currentPriority.$===1?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("Medium")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(High)), Attr.Create("style", currentPriority.$===2?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("High")])]), priorityVar.View);
-  const selectedPriorityText=Doc.BindView((currentPriority) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.TextNode("Selected priority: "+priorityToString(currentPriority))]), priorityVar.View);
-  const filterButtons=Doc.BindView((currentFilter) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 20px;")], [Doc.TextNode("Filter: "), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(All)), Attr.Create("style", currentFilter.$===0?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("All")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(Active)), Attr.Create("style", currentFilter.$===1?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("Active")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(Done)), Attr.Create("style", currentFilter.$===2?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("Done")])]), filterVar.View);
+  const priorityButtons=Doc.BindView((currentPriority) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 12px;")], [Doc.Element("div", [Attr.Create("style", "font-weight: bold; margin-bottom: 6px;")], [Doc.TextNode("Priority")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(Low)), Attr.Create("style", currentPriority.$===0?"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #2e7d32; background: #e8f5e9; font-weight: bold; cursor: pointer;":"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;")], [Doc.TextNode("Low")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(Medium)), Attr.Create("style", currentPriority.$===1?"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #f9a825; background: #fff8e1; font-weight: bold; cursor: pointer;":"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;")], [Doc.TextNode("Medium")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(High)), Attr.Create("style", currentPriority.$===2?"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #c62828; background: #ffebee; font-weight: bold; cursor: pointer;":"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;")], [Doc.TextNode("High")])]), priorityVar.View);
+  const selectedPriorityText=Doc.BindView((currentPriority) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 16px; color: #444;")], [Doc.TextNode("Selected priority: "+priorityToString(currentPriority))]), priorityVar.View);
+  const filterButtons=Doc.BindView((currentFilter) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 20px;")], [Doc.Element("span", [Attr.Create("style", "font-weight: bold; margin-right: 10px;")], [Doc.TextNode("Filter")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(All)), Attr.Create("style", currentFilter.$===0?"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: none; background: #1976d2; color: white; font-weight: bold; cursor: pointer;":"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;")], [Doc.TextNode("All")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(Active)), Attr.Create("style", currentFilter.$===1?"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: none; background: #1976d2; color: white; font-weight: bold; cursor: pointer;":"margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;")], [Doc.TextNode("Active")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(Done)), Attr.Create("style", currentFilter.$===2?"padding: 8px 14px; border-radius: 8px; border: none; background: #1976d2; color: white; font-weight: bold; cursor: pointer;":"padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;")], [Doc.TextNode("Done")])]), filterVar.View);
+  const statsPanel=Doc.EmbedView(Map((tasks) => {
+    const total=length(tasks);
+    const doneCount=length(filter((t) => t.IsDone, tasks));
+    return Doc.Element("div", [Attr.Create("style", "display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;")], [Doc.Element("div", [Attr.Create("style", "padding: 12px 18px; border-radius: 10px; background: #f5f5f5; min-width: 110px;")], [Doc.Element("div", [Attr.Create("style", "font-size: 12px; color: #666;")], [Doc.TextNode("Total")]), Doc.Element("div", [Attr.Create("style", "font-size: 22px; font-weight: bold;")], [Doc.TextNode(String(total))])]), Doc.Element("div", [Attr.Create("style", "padding: 12px 18px; border-radius: 10px; background: #e8f5e9; min-width: 110px;")], [Doc.Element("div", [Attr.Create("style", "font-size: 12px; color: #666;")], [Doc.TextNode("Active")]), Doc.Element("div", [Attr.Create("style", "font-size: 22px; font-weight: bold;")], [Doc.TextNode(String(total-doneCount))])]), Doc.Element("div", [Attr.Create("style", "padding: 12px 18px; border-radius: 10px; background: #e3f2fd; min-width: 110px;")], [Doc.Element("div", [Attr.Create("style", "font-size: 12px; color: #666;")], [Doc.TextNode("Done")]), Doc.Element("div", [Attr.Create("style", "font-size: 22px; font-weight: bold;")], [Doc.TextNode(String(doneCount))])])]);
+  }, tasksVar.View));
   const taskList=Doc.BindView((_2) => {
     const tasks=_2[0];
-    const _3=_2[1];
-    let _4=_3.$==1?filter((t) =>!t.IsDone, tasks):_3.$==2?filter((t) => t.IsDone, tasks):tasks;
-    let _5=map((t) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.Element("span", [Attr.Create("style", t.IsDone?"text-decoration: line-through; margin-right: 10px;":"margin-right: 10px;")], [Doc.TextNode(t.Title+" | "+t.Subject+" | "+priorityToString(t.Priority))]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
+    const filter_2=_2[1];
+    const filtered=filter_2.$==1?filter((t) =>!t.IsDone, tasks):filter_2.$==2?filter((t) => t.IsDone, tasks):tasks;
+    return filtered.$==0?Doc.Element("div", [Attr.Create("style", "padding: 18px; border-radius: 10px; background: #fafafa; color: #666;")], [Doc.TextNode("No tasks in this view.")]):Doc.Concat(map((t) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 12px; padding: 14px; border: 1px solid #e0e0e0; border-radius: 12px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.06);")], [Doc.Element("div", [Attr.Create("style", "display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;")], [Doc.Element("div", [], [Doc.Element("div", [Attr.Create("style", t.IsDone?"font-size: 18px; font-weight: bold; text-decoration: line-through; color: #777; margin-bottom: 4px;":"font-size: 18px; font-weight: bold; margin-bottom: 4px;")], [Doc.TextNode(t.Title)]), Doc.Element("div", [Attr.Create("style", "color: #555; margin-bottom: 6px;")], [Doc.TextNode("Subject: "+t.Subject)]), Doc.Element("span", [Attr.Create("style", "display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: bold; color: white; background: "+priorityColor(t.Priority)+";")], [Doc.TextNode(priorityToString(t.Priority))])]), Doc.Element("div", [], [Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
       const taskId=t.Id;
       return tasksVar.Set(map((t_1) => t_1.Id===taskId?New(t_1.Id, t_1.Title, t_1.Subject, t_1.Priority, !t_1.IsDone):t_1, tasksVar.Get()));
-    }), Attr.Create("style", "margin-right: 6px;")], [Doc.TextNode(t.IsDone?"Undo":"Done")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
+    }), Attr.Create("style", "margin-right: 8px; padding: 8px 12px; border-radius: 8px; border: none; background: #424242; color: white; cursor: pointer;")], [Doc.TextNode(t.IsDone?"Undo":"Done")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
       const taskId=t.Id;
       return tasksVar.Set(filter((t_1) => t_1.Id!==taskId, tasksVar.Get()));
-    })], [Doc.TextNode("Delete")])]), _4);
-    return Doc.Concat(_5);
+    }), Attr.Create("style", "padding: 8px 12px; border-radius: 8px; border: none; background: #d32f2f; color: white; cursor: pointer;")], [Doc.TextNode("Delete")])])])]), filtered));
   }, Map2((_2, _3) =>[_2, _3], tasksVar.View, filterVar.View));
-  const _1=Doc.Element("div", [], [Doc.Element("h1", [], [Doc.TextNode("StudyFlow")]), Doc.Element("h3", [], [Doc.TextNode("Add new task")]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.Input([Attr.Create("placeholder", "Task title")], titleVar)]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.Input([Attr.Create("placeholder", "Subject")], subjectVar)]), priorityButtons, selectedPriorityText, Doc.Element("div", [Attr.Create("style", "margin-bottom: 20px;")], [Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
+  const _1=Doc.Element("div", [Attr.Create("style", "max-width: 900px; margin: 40px auto; padding: 24px; font-family: Arial, sans-serif; background: #fcfcfc;")], [Doc.Element("div", [Attr.Create("style", "background: linear-gradient(135deg, #1976d2, #42a5f5); color: white; padding: 24px; border-radius: 16px; margin-bottom: 24px;")], [Doc.Element("h1", [Attr.Create("style", "margin: 0 0 8px 0;")], [Doc.TextNode("StudyFlow")]), Doc.Element("p", [Attr.Create("style", "margin: 0; font-size: 16px;")], [Doc.TextNode("A simple study task manager built with F# and WebSharper.")])]), statsPanel, Doc.Element("div", [Attr.Create("style", "background: white; padding: 20px; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 24px;")], [Doc.Element("h3", [Attr.Create("style", "margin-top: 0;")], [Doc.TextNode("Add new task")]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.Input([Attr.Create("placeholder", "Task title"), Attr.Create("style", "width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cccccc; box-sizing: border-box;")], titleVar)]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.Input([Attr.Create("placeholder", "Subject"), Attr.Create("style", "width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cccccc; box-sizing: border-box;")], subjectVar)]), priorityButtons, selectedPriorityText, Doc.Element("div", [], [Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
     const title=Trim(titleVar.Get());
     const subject=Trim(subjectVar.Get());
     const priority=priorityVar.Get();
@@ -40,9 +44,12 @@ function Main(){
       return priorityVar.Set(Medium);
     }
     else return null;
-  })], [Doc.TextNode("Add")])]), filterButtons, Doc.Element("h3", [], [Doc.TextNode("Task list")]), Doc.Element("div", [], [taskList])]);
+  }), Attr.Create("style", "padding: 10px 16px; border-radius: 8px; border: none; background: #1976d2; color: white; font-weight: bold; cursor: pointer;")], [Doc.TextNode("Add task")])])]), filterButtons, Doc.Element("h3", [], [Doc.TextNode("Task list")]), Doc.Element("div", [], [taskList])]);
   LoadLocalTemplates("");
   Doc.RunById("main", _1);
+}
+function priorityColor(p){
+  return p.$==1?"#f9a825":p.$==2?"#c62828":"#2e7d32";
 }
 function priorityToString(p){
   return p.$==1?"Medium":p.$==2?"High":"Low";
@@ -72,7 +79,7 @@ let Active={$:1};
 let Done={$:2};
 function ofArray(arr){
   let r=FSharpList.Empty;
-  for(let i=length(arr)-1, _1=0;i>=_1;i--)r=FSharpList.Cons(get(arr, i), r);
+  for(let i=length_1(arr)-1, _1=0;i>=_1;i--)r=FSharpList.Cons(get(arr, i), r);
   return r;
 }
 function map(f, x){
@@ -98,6 +105,16 @@ function map(f, x){
     r.$1=FSharpList.Empty;
     return res;
   }
+}
+function length(l){
+  let r=l;
+  let i=0;
+  while(r.$==1)
+    {
+      r=tail(r);
+      i=i+1;
+    }
+  return i;
 }
 function filter(p, x){
   let res;
@@ -157,14 +174,14 @@ function append(x, y){
     return res;
   }
 }
-function head(l){
-  return l.$==1?l.$0:listEmpty();
-}
 function tail(l){
   return l.$==1?l.$1:listEmpty();
 }
 function listEmpty(){
   return FailWith("The input list was empty.");
+}
+function head(l){
+  return l.$==1?l.$0:listEmpty();
 }
 function New(Id, Title, Subject, Priority, IsDone){
   return{
@@ -189,6 +206,9 @@ class attr extends Object_1 { }
 function Map2(fn, a, a_1){
   return CreateLazy(() => Map2_1(fn, a(), a_1()));
 }
+function Map(fn, a){
+  return CreateLazy(() => Map_1(fn, a()));
+}
 function CreateLazy(observe){
   const lv={c:null, o:observe};
   return() => {
@@ -210,14 +230,14 @@ function Const(x){
   const o={s:Forever(x)};
   return() => o;
 }
-function Map(fn, a){
-  return CreateLazy(() => Map_1(fn, a()));
-}
 function Map2Unit(a, a_1){
   return CreateLazy(() => Map2Unit_1(a(), a_1()));
 }
 function Bind(fn, view){
   return Join(Map(fn, view));
+}
+function Join(a){
+  return CreateLazy(() => Join_1(a()));
 }
 function Sink(act, a){
   function loop(){
@@ -226,9 +246,6 @@ function Sink(act, a){
     });
   }
   scheduler().Fork(loop);
-}
-function Join(a){
-  return CreateLazy(() => Join_1(a()));
 }
 class Var extends Object_1 { }
 class Doc extends Object_1 {
@@ -257,6 +274,13 @@ class Doc extends Object_1 {
   static get Empty(){
     return Doc.Mk(null, Const());
   }
+  static EmbedView(view){
+    const node=CreateEmbedNode();
+    return Doc.Mk(EmbedDoc(node), Map(() => { }, Bind((doc) => {
+      UpdateEmbedNode(node, doc.docNode);
+      return doc.updates;
+    }, view)));
+  }
   static Element(name, attr_1, children){
     const a=Attr.Concat(attr_1);
     const c=Doc.Concat(children);
@@ -272,13 +296,6 @@ class Doc extends Object_1 {
   static Run(parent, doc){
     LinkElement(parent, doc.docNode);
     Doc.RunInPlace(false, parent, doc);
-  }
-  static EmbedView(view){
-    const node=CreateEmbedNode();
-    return Doc.Mk(EmbedDoc(node), Map(() => { }, Bind((doc) => {
-      UpdateEmbedNode(node, doc.docNode);
-      return doc.updates;
-    }, view)));
   }
   static RunInPlace(childrenOnly, parent, doc){
     const st=CreateRunState(parent, doc.docNode);
@@ -348,6 +365,17 @@ function Map2_1(fn, sn1, sn2){
     return res;
   }
 }
+function Map_1(fn, sn){
+  const m=sn.s;
+  if(m!=null&&m.$==0)return{s:Forever(fn(m.$0))};
+  else {
+    const res={s:Waiting([], [])};
+    When(sn, (a) => {
+      MarkDone(res, sn, fn(a));
+    }, res);
+    return res;
+  }
+}
 function WhenObsoleteRun(snap, obs){
   const m=snap.s;
   if(m==null)obs();
@@ -368,7 +396,7 @@ function MarkForever(sn, v){
   if(m!=null&&m.$==3){
     const q=m.$0;
     sn.s=Forever(v);
-    for(let i=0, _1=length(q)-1;i<=_1;i++)(get(q, i))(v);
+    for(let i=0, _1=length_1(q)-1;i<=_1;i++)(get(q, i))(v);
   }
   else void 0;
 }
@@ -378,7 +406,7 @@ function MarkReady(sn, v){
     const q2=m.$1;
     const q1=m.$0;
     sn.s=Ready(v, q2);
-    for(let i=0, _1=length(q1)-1;i<=_1;i++)(get(q1, i))(v);
+    for(let i=0, _1=length_1(q1)-1;i<=_1;i++)(get(q1, i))(v);
   }
   else void 0;
 }
@@ -397,23 +425,17 @@ function When(snap, avail, obs){
   }
   else avail(m.$0);
 }
-function Map_1(fn, sn){
-  const m=sn.s;
-  if(m!=null&&m.$==0)return{s:Forever(fn(m.$0))};
-  else {
-    const res={s:Waiting([], [])};
-    When(sn, (a) => {
-      MarkDone(res, sn, fn(a));
-    }, res);
-    return res;
-  }
+function MarkDone(res, sn, v){
+  const _1=sn.s;
+  if(_1!=null&&_1.$==0)MarkForever(res, v);
+  else MarkReady(res, v);
 }
 function EnqueueSafe(q, x){
   q.push(x);
   if(q.length%20===0){
     const qcopy=q.slice(0);
     Clear(q);
-    for(let i=0, _1=length(qcopy)-1;i<=_1;i++){
+    for(let i=0, _1=length_1(qcopy)-1;i<=_1;i++){
       const o=get(qcopy, i);
       if(typeof o=="object")(((sn) => {
         if(sn.s)q.push(sn);
@@ -446,26 +468,6 @@ function Map2Unit_1(sn1, sn2){
     return res;
   }
 }
-function MarkDone(res, sn, v){
-  const _1=sn.s;
-  if(_1!=null&&_1.$==0)MarkForever(res, v);
-  else MarkReady(res, v);
-}
-function WhenRun(snap, avail, obs){
-  const m=snap.s;
-  if(m==null)obs();
-  else if(m!=null&&m.$==2){
-    const v=m.$0;
-    m.$1.push(obs);
-    avail(v);
-  }
-  else if(m!=null&&m.$==3){
-    const q2=m.$1;
-    m.$0.push(avail);
-    q2.push(obs);
-  }
-  else avail(m.$0);
-}
 function Join_1(snap){
   const res={s:Waiting([], [])};
   When(snap, (x) => {
@@ -483,6 +485,21 @@ function Join_1(snap){
     }, res);
   }, res);
   return res;
+}
+function WhenRun(snap, avail, obs){
+  const m=snap.s;
+  if(m==null)obs();
+  else if(m!=null&&m.$==2){
+    const v=m.$0;
+    m.$1.push(obs);
+    avail(v);
+  }
+  else if(m!=null&&m.$==3){
+    const q2=m.$1;
+    m.$0.push(avail);
+    q2.push(obs);
+  }
+  else avail(m.$0);
 }
 function Copy(sn){
   const m=sn.s;
@@ -535,7 +552,7 @@ function get(arr, n){
   checkBounds(arr, n);
   return arr[n];
 }
-function length(arr){
+function length_1(arr){
   return arr.dims===2?arr.length*arr.length:arr.length;
 }
 function checkBounds(arr, n){
@@ -904,7 +921,7 @@ function ofSeqNonCopying(xs){
   }
 }
 function TreeReduce(defaultValue, reduction, array){
-  const l=length(array);
+  const l=length_1(array);
   function loop(off){
     return(len) => {
       let _1;
@@ -922,7 +939,7 @@ function TreeReduce(defaultValue, reduction, array){
   return(loop(0))(l);
 }
 function MapTreeReduce(mapping, defaultValue, reduction, array){
-  const l=length(array);
+  const l=length_1(array);
   function loop(off){
     return(len) => {
       let _1;
@@ -992,83 +1009,6 @@ function Waiting(Item1, Item2){
     $0:Item1, 
     $1:Item2
   };
-}
-function ParseHTMLIntoFakeRoot(elem){
-  const root=globalThis.document.createElement("div");
-  if(!rhtml().test(elem)){
-    root.appendChild(globalThis.document.createTextNode(elem));
-    return root;
-  }
-  else {
-    const m=rtagName().exec(elem);
-    const tag=Equals(m, null)?"":get(m, 1).toLowerCase();
-    const w=(wrapMap())[tag];
-    const p=w?w:defaultWrap();
-    root.innerHTML=p[1]+elem.replace(rxhtmlTag(), "<$1></$2>")+p[2];
-    function unwrap(elt, a){
-      while(true)
-        {
-          if(a===0)return elt;
-          else {
-            const i=a;
-            elt=elt.lastChild;
-            a=i-1;
-          }
-        }
-    }
-    return(((a) => {
-      const _1=a;
-      return(_2) => unwrap(_1, _2);
-    })(root))(p[0]);
-  }
-}
-function rhtml(){
-  return _c_5.rhtml;
-}
-function wrapMap(){
-  return _c_5.wrapMap;
-}
-function defaultWrap(){
-  return _c_5.defaultWrap;
-}
-function rxhtmlTag(){
-  return _c_5.rxhtmlTag;
-}
-function rtagName(){
-  return _c_5.rtagName;
-}
-function IterSelector(el, selector, f){
-  const l=el.querySelectorAll(selector);
-  for(let i=0, _1=l.length-1;i<=_1;i++)f(l[i]);
-}
-function InsertAt(parent, pos, node){
-  let _1;
-  if(node.parentNode===parent){
-    const m=node.nextSibling;
-    let _2=Equals(m, null)?null:m;
-    _1=pos===_2;
-  }
-  else _1=false;
-  if(!_1)parent.insertBefore(node, pos);
-}
-function RemoveNode(parent, el){
-  if(el.parentNode===parent)parent.removeChild(el);
-}
-function TextNodeDoc(Item){
-  return{$:5, $0:Item};
-}
-function AppendDoc(Item1, Item2){
-  return{
-    $:0, 
-    $0:Item1, 
-    $1:Item2
-  };
-}
-function EmbedDoc(Item){
-  return{$:2, $0:Item};
-}
-function ElemDoc(Item){
-  return{$:1, $0:Item};
 }
 function Updates(dyn){
   return MapTreeReduce((x) => x.NChanged, Const(), Map2Unit, dyn.DynNodes);
@@ -1150,6 +1090,83 @@ function Sync(elem, dyn){
   iter_1((d) => {
     d.NSync(elem);
   }, dyn.DynNodes);
+}
+function ParseHTMLIntoFakeRoot(elem){
+  const root=globalThis.document.createElement("div");
+  if(!rhtml().test(elem)){
+    root.appendChild(globalThis.document.createTextNode(elem));
+    return root;
+  }
+  else {
+    const m=rtagName().exec(elem);
+    const tag=Equals(m, null)?"":get(m, 1).toLowerCase();
+    const w=(wrapMap())[tag];
+    const p=w?w:defaultWrap();
+    root.innerHTML=p[1]+elem.replace(rxhtmlTag(), "<$1></$2>")+p[2];
+    function unwrap(elt, a){
+      while(true)
+        {
+          if(a===0)return elt;
+          else {
+            const i=a;
+            elt=elt.lastChild;
+            a=i-1;
+          }
+        }
+    }
+    return(((a) => {
+      const _1=a;
+      return(_2) => unwrap(_1, _2);
+    })(root))(p[0]);
+  }
+}
+function rhtml(){
+  return _c_5.rhtml;
+}
+function wrapMap(){
+  return _c_5.wrapMap;
+}
+function defaultWrap(){
+  return _c_5.defaultWrap;
+}
+function rxhtmlTag(){
+  return _c_5.rxhtmlTag;
+}
+function rtagName(){
+  return _c_5.rtagName;
+}
+function IterSelector(el, selector, f){
+  const l=el.querySelectorAll(selector);
+  for(let i=0, _1=l.length-1;i<=_1;i++)f(l[i]);
+}
+function InsertAt(parent, pos, node){
+  let _1;
+  if(node.parentNode===parent){
+    const m=node.nextSibling;
+    let _2=Equals(m, null)?null:m;
+    _1=pos===_2;
+  }
+  else _1=false;
+  if(!_1)parent.insertBefore(node, pos);
+}
+function RemoveNode(parent, el){
+  if(el.parentNode===parent)parent.removeChild(el);
+}
+function TextNodeDoc(Item){
+  return{$:5, $0:Item};
+}
+function AppendDoc(Item1, Item2){
+  return{
+    $:0, 
+    $0:Item1, 
+    $1:Item2
+  };
+}
+function EmbedDoc(Item){
+  return{$:2, $0:Item};
+}
+function ElemDoc(Item){
+  return{$:1, $0:Item};
 }
 function append_1(s1, s2){
   return{GetEnumerator:() => {
@@ -1386,7 +1403,7 @@ class Dictionary extends Object_1 {
     if(d==null)return false;
     else {
       const r=filter_1((a) =>!this.equals.apply(null, [(KeyValue(a))[0], k]), d);
-      return length(r)<d.length&&(this.count=this.count-1,this.data[h]=r,true);
+      return length_1(r)<d.length&&(this.count=this.count-1,this.data[h]=r,true);
     }
   }
   Item(k){
@@ -1468,10 +1485,10 @@ function Equals(a, b){
 function arrayEquals(a, b){
   let eq;
   let i;
-  if(length(a)===length(b)){
+  if(length_1(a)===length_1(b)){
     eq=true;
     i=0;
-    while(eq&&i<length(a))
+    while(eq&&i<length_1(a))
       {
         !Equals(get(a, i), get(b, i))?eq=false:void 0;
         i=i+1;
@@ -1498,7 +1515,7 @@ function hashString(s){
 }
 function hashArray(o){
   let h=-34948909;
-  for(let i=0, _1=length(o)-1;i<=_1;i++)h=hashMix(h, Hash(get(o, i)));
+  for(let i=0, _1=length_1(o)-1;i<=_1;i++)h=hashMix(h, Hash(get(o, i)));
   return h;
 }
 function hashObject(o){
@@ -1556,12 +1573,12 @@ function Compare(a, b){
 function compareArrays(a, b){
   let cmp;
   let i;
-  if(length(a)<length(b))return -1;
-  else if(length(a)>length(b))return 1;
+  if(length_1(a)<length_1(b))return -1;
+  else if(length_1(a)>length_1(b))return 1;
   else {
     cmp=0;
     i=0;
-    while(cmp===0&&i<length(a))
+    while(cmp===0&&i<length_1(a))
       {
         cmp=Compare(get(a, i), get(b, i));
         i=i+1;
@@ -1578,7 +1595,7 @@ function Obsolete(sn){
   if(m==null||(m!=null&&m.$==2?(_1=m.$1,false):m!=null&&m.$==3?(_1=m.$1,false):true))void 0;
   else {
     sn.s=null;
-    for(let i=0, _2=length(_1)-1;i<=_2;i++){
+    for(let i=0, _2=length_1(_1)-1;i<=_2;i++){
       const o=get(_1, i);
       if(typeof o=="object")(((sn_1) => {
         Obsolete(sn_1);
@@ -1601,7 +1618,7 @@ function ofList(xs){
 function exists_1(f, x){
   let e=false;
   let i=0;
-  const l=length(x);
+  const l=length_1(x);
   while(!e&&i<l)
     if(f(x[i]))e=true;
     else i=i+1;
@@ -1695,11 +1712,207 @@ function init_1(size, f){
 function forall_2(f, x){
   let a=true;
   let i=0;
-  const l=length(x);
+  const l=length_1(x);
   while(a&&i<l)
     if(f(x[i]))i=i+1;
     else a=false;
   return a;
+}
+function CreateEmbedNode(){
+  return{Current:null, Dirty:false};
+}
+function UpdateEmbedNode(node, upd){
+  node.Current=upd;
+  node.Dirty=true;
+}
+function LinkElement(el, children){
+  InsertDoc(el, children, null);
+}
+function InsertDoc(parent, doc, pos){
+  while(true)
+    {
+      if(doc!=null&&doc.$==1)return InsertNode(parent, doc.$0.El, pos);
+      else if(doc!=null&&doc.$==2){
+        const d=doc.$0;
+        d.Dirty=false;
+        doc=d.Current;
+      }
+      else if(doc==null)return pos;
+      else if(doc!=null&&doc.$==4)return InsertNode(parent, doc.$0.Text, pos);
+      else if(doc!=null&&doc.$==5)return InsertNode(parent, doc.$0, pos);
+      else if(doc!=null&&doc.$==6)return foldBack((_1, _2) =>((((parent_1) =>(el) =>(pos_1) => el==null||el.constructor===Object?InsertDoc(parent_1, el, pos_1):InsertNode(parent_1, el, pos_1))(parent))(_1))(_2), doc.$0.Els, pos);
+      else {
+        const b=doc.$1;
+        const a=doc.$0;
+        doc=a;
+        pos=InsertDoc(parent, b, pos);
+      }
+    }
+}
+function CreateRunState(parent, doc){
+  return New_2(get_Empty_1(), CreateElemNode(parent, EmptyAttr(), doc));
+}
+function PerformAnimatedUpdate(childrenOnly, st, doc){
+  return get_UseAnimations()?Delay(() => {
+    const cur=FindAll(doc);
+    const change=ComputeChangeAnim(st, cur);
+    const enter=ComputeEnterAnim(st, cur);
+    return Bind_1(Play(Append(change, ComputeExitAnim(st, cur))), () => Bind_1(SyncElemNodesNextFrame(childrenOnly, st), () => Bind_1(Play(enter), () => {
+      st.PreviousNodes=cur;
+      return Return(null);
+    })));
+  }):SyncElemNodesNextFrame(childrenOnly, st);
+}
+function PerformSyncUpdate(childrenOnly, st, doc){
+  const cur=FindAll(doc);
+  SyncElemNode(childrenOnly, st.Top);
+  st.PreviousNodes=cur;
+}
+function CreateElemNode(el, attr_1, children){
+  LinkElement(el, children);
+  const attr_2=Insert(el, attr_1);
+  return DocElemNode.New(attr_2, children, null, el, Int(), GetOptional(attr_2.OnAfterRender));
+}
+function InsertNode(parent, node, pos){
+  InsertAt(parent, pos, node);
+  return node;
+}
+function SyncElemNodesNextFrame(childrenOnly, st){
+  if(BatchUpdatesEnabled()){
+    const c=(ok) => {
+      requestAnimationFrame(() => {
+        SyncElemNode(childrenOnly, st.Top);
+        ok();
+      });
+    };
+    return FromContinuations((_1, _2, _3) => c.apply(null, [_1, _2, _3]));
+  }
+  else {
+    SyncElemNode(childrenOnly, st.Top);
+    return Return(null);
+  }
+}
+function ComputeExitAnim(st, cur){
+  return Concat(map_2((n) => GetExitAnim(n.Attr), ToArray(Except(cur, Filter((n) => HasExitAnim(n.Attr), st.PreviousNodes)))));
+}
+function ComputeEnterAnim(st, cur){
+  return Concat(map_2((n) => GetEnterAnim(n.Attr), ToArray(Except(st.PreviousNodes, Filter((n) => HasEnterAnim(n.Attr), cur)))));
+}
+function ComputeChangeAnim(st, cur){
+  const f=(n) => HasChangeAnim(n.Attr);
+  const relevant=(a) => Filter(f, a);
+  return Concat(map_2((n) => GetChangeAnim(n.Attr), ToArray(Intersect(relevant(st.PreviousNodes), relevant(cur)))));
+}
+function SyncElemNode(childrenOnly, el){
+  !childrenOnly?SyncElement(el):void 0;
+  Sync_1(el.Children);
+  AfterRender(el);
+}
+function SyncElement(el){
+  function hasDirtyChildren(el_1){
+    function dirty(doc){
+      while(true)
+        {
+          if(doc!=null&&doc.$==0){
+            const b=doc.$1;
+            const a=doc.$0;
+            if(dirty(a))return true;
+            else doc=b;
+          }
+          else if(doc!=null&&doc.$==2){
+            const d=doc.$0;
+            if(d.Dirty)return true;
+            else doc=d.Current;
+          }
+          else if(doc!=null&&doc.$==6){
+            const t=doc.$0;
+            return t.Dirty||exists_1(hasDirtyChildren, t.Holes);
+          }
+          else return false;
+        }
+    }
+    return dirty(el_1.Children);
+  }
+  Sync(el.El, el.Attr);
+  if(hasDirtyChildren(el))DoSyncElement(el);
+}
+function Sync_1(doc){
+  while(true)
+    {
+      if(doc!=null&&doc.$==1)return SyncElemNode(false, doc.$0);
+      else if(doc!=null&&doc.$==2){
+        const n=doc.$0;
+        doc=n.Current;
+      }
+      else if(doc==null)return null;
+      else if(doc!=null&&doc.$==5)return null;
+      else if(doc!=null&&doc.$==4){
+        const d=doc.$0;
+        return d.Dirty?(d.Text.nodeValue=d.Value,d.Dirty=false):null;
+      }
+      else if(doc!=null&&doc.$==6){
+        const t=doc.$0;
+        iter_1((h) => {
+          SyncElemNode(false, h);
+        }, t.Holes);
+        iter_1((t_1) => {
+          Sync(t_1[0], t_1[1]);
+        }, t.Attrs);
+        return AfterRender(t);
+      }
+      else {
+        const b=doc.$1;
+        const a=doc.$0;
+        Sync_1(a);
+        doc=b;
+      }
+    }
+}
+function AfterRender(el){
+  const m=GetOptional(el.Render);
+  if(m!=null&&m.$==1){
+    m.$0(el.El);
+    SetOptional(el, "Render", null);
+  }
+}
+function DoSyncElement(el){
+  const parent=el.El;
+  function ins(doc, pos){
+    while(true)
+      {
+        if(doc!=null&&doc.$==1)return doc.$0.El;
+        else if(doc!=null&&doc.$==2){
+          const d=doc.$0;
+          if(d.Dirty){
+            d.Dirty=false;
+            return InsertDoc(parent, d.Current, pos);
+          }
+          else doc=d.Current;
+        }
+        else if(doc==null)return pos;
+        else if(doc!=null&&doc.$==4)return doc.$0.Text;
+        else if(doc!=null&&doc.$==5)return doc.$0;
+        else if(doc!=null&&doc.$==6){
+          const t=doc.$0;
+          if(t.Dirty)t.Dirty=false;
+          return foldBack((_3, _4) => _3==null||_3.constructor===Object?ins(_3, _4):_3, t.Els, pos);
+        }
+        else {
+          const b=doc.$1;
+          const a=doc.$0;
+          doc=a;
+          pos=ins(b, pos);
+        }
+      }
+  }
+  const p=el.El;
+  Iter((e) => {
+    RemoveNode(p, e);
+  }, Except_2(DocChildren(el), Children(el.El, GetOptional(el.Delimiters))));
+  let _1=el.Children;
+  const m=GetOptional(el.Delimiters);
+  let _2=m!=null&&m.$==1?m.$0[1]:null;
+  ins(_1, _2);
 }
 function Get(x){
   return x instanceof Array?ArrayEnumerator(x):Equals(typeof x, "string")?StringEnumerator(x):x.GetEnumerator();
@@ -1707,7 +1920,7 @@ function Get(x){
 function ArrayEnumerator(s){
   return new T(0, null, (e) => {
     const i=e.s;
-    return i<length(s)&&(e.c=get(s, i),e.s=i+1,true);
+    return i<length_1(s)&&(e.c=get(s, i),e.s=i+1,true);
   }, void 0);
 }
 function StringEnumerator(s){
@@ -1965,202 +2178,6 @@ function Some(Value_1){
   return{$:1, $0:Value_1};
 }
 class Exception extends Object_1 { }
-function LinkElement(el, children){
-  InsertDoc(el, children, null);
-}
-function CreateEmbedNode(){
-  return{Current:null, Dirty:false};
-}
-function UpdateEmbedNode(node, upd){
-  node.Current=upd;
-  node.Dirty=true;
-}
-function InsertDoc(parent, doc, pos){
-  while(true)
-    {
-      if(doc!=null&&doc.$==1)return InsertNode(parent, doc.$0.El, pos);
-      else if(doc!=null&&doc.$==2){
-        const d=doc.$0;
-        d.Dirty=false;
-        doc=d.Current;
-      }
-      else if(doc==null)return pos;
-      else if(doc!=null&&doc.$==4)return InsertNode(parent, doc.$0.Text, pos);
-      else if(doc!=null&&doc.$==5)return InsertNode(parent, doc.$0, pos);
-      else if(doc!=null&&doc.$==6)return foldBack((_1, _2) =>((((parent_1) =>(el) =>(pos_1) => el==null||el.constructor===Object?InsertDoc(parent_1, el, pos_1):InsertNode(parent_1, el, pos_1))(parent))(_1))(_2), doc.$0.Els, pos);
-      else {
-        const b=doc.$1;
-        const a=doc.$0;
-        doc=a;
-        pos=InsertDoc(parent, b, pos);
-      }
-    }
-}
-function CreateRunState(parent, doc){
-  return New_2(get_Empty_1(), CreateElemNode(parent, EmptyAttr(), doc));
-}
-function PerformAnimatedUpdate(childrenOnly, st, doc){
-  return get_UseAnimations()?Delay(() => {
-    const cur=FindAll(doc);
-    const change=ComputeChangeAnim(st, cur);
-    const enter=ComputeEnterAnim(st, cur);
-    return Bind_1(Play(Append(change, ComputeExitAnim(st, cur))), () => Bind_1(SyncElemNodesNextFrame(childrenOnly, st), () => Bind_1(Play(enter), () => {
-      st.PreviousNodes=cur;
-      return Return(null);
-    })));
-  }):SyncElemNodesNextFrame(childrenOnly, st);
-}
-function PerformSyncUpdate(childrenOnly, st, doc){
-  const cur=FindAll(doc);
-  SyncElemNode(childrenOnly, st.Top);
-  st.PreviousNodes=cur;
-}
-function CreateElemNode(el, attr_1, children){
-  LinkElement(el, children);
-  const attr_2=Insert(el, attr_1);
-  return DocElemNode.New(attr_2, children, null, el, Int(), GetOptional(attr_2.OnAfterRender));
-}
-function InsertNode(parent, node, pos){
-  InsertAt(parent, pos, node);
-  return node;
-}
-function SyncElemNodesNextFrame(childrenOnly, st){
-  if(BatchUpdatesEnabled()){
-    const c=(ok) => {
-      requestAnimationFrame(() => {
-        SyncElemNode(childrenOnly, st.Top);
-        ok();
-      });
-    };
-    return FromContinuations((_1, _2, _3) => c.apply(null, [_1, _2, _3]));
-  }
-  else {
-    SyncElemNode(childrenOnly, st.Top);
-    return Return(null);
-  }
-}
-function ComputeExitAnim(st, cur){
-  return Concat(map_2((n) => GetExitAnim(n.Attr), ToArray(Except(cur, Filter((n) => HasExitAnim(n.Attr), st.PreviousNodes)))));
-}
-function ComputeEnterAnim(st, cur){
-  return Concat(map_2((n) => GetEnterAnim(n.Attr), ToArray(Except(st.PreviousNodes, Filter((n) => HasEnterAnim(n.Attr), cur)))));
-}
-function ComputeChangeAnim(st, cur){
-  const f=(n) => HasChangeAnim(n.Attr);
-  const relevant=(a) => Filter(f, a);
-  return Concat(map_2((n) => GetChangeAnim(n.Attr), ToArray(Intersect(relevant(st.PreviousNodes), relevant(cur)))));
-}
-function SyncElemNode(childrenOnly, el){
-  !childrenOnly?SyncElement(el):void 0;
-  Sync_1(el.Children);
-  AfterRender(el);
-}
-function SyncElement(el){
-  function hasDirtyChildren(el_1){
-    function dirty(doc){
-      while(true)
-        {
-          if(doc!=null&&doc.$==0){
-            const b=doc.$1;
-            const a=doc.$0;
-            if(dirty(a))return true;
-            else doc=b;
-          }
-          else if(doc!=null&&doc.$==2){
-            const d=doc.$0;
-            if(d.Dirty)return true;
-            else doc=d.Current;
-          }
-          else if(doc!=null&&doc.$==6){
-            const t=doc.$0;
-            return t.Dirty||exists_1(hasDirtyChildren, t.Holes);
-          }
-          else return false;
-        }
-    }
-    return dirty(el_1.Children);
-  }
-  Sync(el.El, el.Attr);
-  if(hasDirtyChildren(el))DoSyncElement(el);
-}
-function Sync_1(doc){
-  while(true)
-    {
-      if(doc!=null&&doc.$==1)return SyncElemNode(false, doc.$0);
-      else if(doc!=null&&doc.$==2){
-        const n=doc.$0;
-        doc=n.Current;
-      }
-      else if(doc==null)return null;
-      else if(doc!=null&&doc.$==5)return null;
-      else if(doc!=null&&doc.$==4){
-        const d=doc.$0;
-        return d.Dirty?(d.Text.nodeValue=d.Value,d.Dirty=false):null;
-      }
-      else if(doc!=null&&doc.$==6){
-        const t=doc.$0;
-        iter_1((h) => {
-          SyncElemNode(false, h);
-        }, t.Holes);
-        iter_1((t_1) => {
-          Sync(t_1[0], t_1[1]);
-        }, t.Attrs);
-        return AfterRender(t);
-      }
-      else {
-        const b=doc.$1;
-        const a=doc.$0;
-        Sync_1(a);
-        doc=b;
-      }
-    }
-}
-function AfterRender(el){
-  const m=GetOptional(el.Render);
-  if(m!=null&&m.$==1){
-    m.$0(el.El);
-    SetOptional(el, "Render", null);
-  }
-}
-function DoSyncElement(el){
-  const parent=el.El;
-  function ins(doc, pos){
-    while(true)
-      {
-        if(doc!=null&&doc.$==1)return doc.$0.El;
-        else if(doc!=null&&doc.$==2){
-          const d=doc.$0;
-          if(d.Dirty){
-            d.Dirty=false;
-            return InsertDoc(parent, d.Current, pos);
-          }
-          else doc=d.Current;
-        }
-        else if(doc==null)return pos;
-        else if(doc!=null&&doc.$==4)return doc.$0.Text;
-        else if(doc!=null&&doc.$==5)return doc.$0;
-        else if(doc!=null&&doc.$==6){
-          const t=doc.$0;
-          if(t.Dirty)t.Dirty=false;
-          return foldBack((_3, _4) => _3==null||_3.constructor===Object?ins(_3, _4):_3, t.Els, pos);
-        }
-        else {
-          const b=doc.$1;
-          const a=doc.$0;
-          doc=a;
-          pos=ins(b, pos);
-        }
-      }
-  }
-  const p=el.El;
-  Iter((e) => {
-    RemoveNode(p, e);
-  }, Except_2(DocChildren(el), Children(el.El, GetOptional(el.Delimiters))));
-  let _1=el.Children;
-  const m=GetOptional(el.Delimiters);
-  let _2=m!=null&&m.$==1?m.$0[1]:null;
-  ins(_1, _2);
-}
 class DocElemNode {
   Attr;
   Children;
@@ -2534,7 +2551,7 @@ function insufficient(){
 function arrContains(item, arr){
   let c=true;
   let i=0;
-  const l=length(arr);
+  const l=length_1(arr);
   while(c&&i<l)
     if(Equals(arr[i], item))c=false;
     else i=i+1;
@@ -2842,7 +2859,7 @@ function Finalize(a){
 }
 function ConcatActions(xs){
   const xs_1=ofSeqNonCopying(xs);
-  const m=length(xs_1);
+  const m=length_1(xs_1);
   if(m===0)return Const_1();
   else if(m===1)return get(xs_1, 0);
   else {
@@ -2880,7 +2897,7 @@ let _c_4=Lazy((_i) => class Proxy {
   }
 });
 function Clear(a){
-  a.splice(0, length(a));
+  a.splice(0, length_1(a));
 }
 class DynamicAttrNode extends Object_1 {
   push;

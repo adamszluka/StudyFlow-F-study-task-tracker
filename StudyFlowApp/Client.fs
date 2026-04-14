@@ -34,6 +34,13 @@ let priorityToString p =
     | Medium -> "Medium"
     | High -> "High"
 
+[<JavaScript>]
+let priorityColor p =
+    match p with
+    | Low -> "#2e7d32"
+    | Medium -> "#f9a825"
+    | High -> "#c62828"
+
 [<JavaScript; SPAEntryPoint>]
 let Main () =
     let titleVar = Var.Create ""
@@ -106,16 +113,18 @@ let Main () =
     let priorityButtons =
         priorityVar.View
         |> Doc.BindView (fun currentPriority ->
-            div [ attr.style "margin-bottom: 6px;" ] [
-                text "Priority: "
+            div [ attr.style "margin-bottom: 12px;" ] [
+                div [ attr.style "font-weight: bold; margin-bottom: 6px;" ] [
+                    text "Priority"
+                ]
 
                 button [
                     on.click (fun _ _ -> priorityVar.Value <- Low)
                     attr.style (
                         if currentPriority = Low then
-                            "margin-right: 6px; font-weight: bold;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #2e7d32; background: #e8f5e9; font-weight: bold; cursor: pointer;"
                         else
-                            "margin-right: 6px;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;"
                     )
                 ] [ text "Low" ]
 
@@ -123,9 +132,9 @@ let Main () =
                     on.click (fun _ _ -> priorityVar.Value <- Medium)
                     attr.style (
                         if currentPriority = Medium then
-                            "margin-right: 6px; font-weight: bold;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #f9a825; background: #fff8e1; font-weight: bold; cursor: pointer;"
                         else
-                            "margin-right: 6px;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;"
                     )
                 ] [ text "Medium" ]
 
@@ -133,9 +142,9 @@ let Main () =
                     on.click (fun _ _ -> priorityVar.Value <- High)
                     attr.style (
                         if currentPriority = High then
-                            "margin-right: 6px; font-weight: bold;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #c62828; background: #ffebee; font-weight: bold; cursor: pointer;"
                         else
-                            "margin-right: 6px;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;"
                     )
                 ] [ text "High" ]
             ]
@@ -144,7 +153,7 @@ let Main () =
     let selectedPriorityText =
         priorityVar.View
         |> Doc.BindView (fun currentPriority ->
-            div [ attr.style "margin-bottom: 10px;" ] [
+            div [ attr.style "margin-bottom: 16px; color: #444;" ] [
                 text ("Selected priority: " + priorityToString currentPriority)
             ]
         )
@@ -153,15 +162,17 @@ let Main () =
         filterVar.View
         |> Doc.BindView (fun currentFilter ->
             div [ attr.style "margin-bottom: 20px;" ] [
-                text "Filter: "
+                span [ attr.style "font-weight: bold; margin-right: 10px;" ] [
+                    text "Filter"
+                ]
 
                 button [
                     on.click (fun _ _ -> filterVar.Value <- All)
                     attr.style (
                         if currentFilter = All then
-                            "margin-right: 6px; font-weight: bold;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: none; background: #1976d2; color: white; font-weight: bold; cursor: pointer;"
                         else
-                            "margin-right: 6px;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;"
                     )
                 ] [ text "All" ]
 
@@ -169,9 +180,9 @@ let Main () =
                     on.click (fun _ _ -> filterVar.Value <- Active)
                     attr.style (
                         if currentFilter = Active then
-                            "margin-right: 6px; font-weight: bold;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: none; background: #1976d2; color: white; font-weight: bold; cursor: pointer;"
                         else
-                            "margin-right: 6px;"
+                            "margin-right: 8px; padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;"
                     )
                 ] [ text "Active" ]
 
@@ -179,67 +190,143 @@ let Main () =
                     on.click (fun _ _ -> filterVar.Value <- Done)
                     attr.style (
                         if currentFilter = Done then
-                            "margin-right: 6px; font-weight: bold;"
+                            "padding: 8px 14px; border-radius: 8px; border: none; background: #1976d2; color: white; font-weight: bold; cursor: pointer;"
                         else
-                            "margin-right: 6px;"
+                            "padding: 8px 14px; border-radius: 8px; border: 1px solid #cccccc; background: white; cursor: pointer;"
                     )
                 ] [ text "Done" ]
             ]
         )
 
+    let statsPanel =
+        View.Map (fun tasks ->
+            let total = List.length tasks
+            let doneCount = tasks |> List.filter (fun t -> t.IsDone) |> List.length
+            let activeCount = total - doneCount
+
+            div [
+                attr.style "display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;"
+            ] [
+                div [ attr.style "padding: 12px 18px; border-radius: 10px; background: #f5f5f5; min-width: 110px;" ] [
+                    div [ attr.style "font-size: 12px; color: #666;" ] [ text "Total" ]
+                    div [ attr.style "font-size: 22px; font-weight: bold;" ] [ text (string total) ]
+                ]
+                div [ attr.style "padding: 12px 18px; border-radius: 10px; background: #e8f5e9; min-width: 110px;" ] [
+                    div [ attr.style "font-size: 12px; color: #666;" ] [ text "Active" ]
+                    div [ attr.style "font-size: 22px; font-weight: bold;" ] [ text (string activeCount) ]
+                ]
+                div [ attr.style "padding: 12px 18px; border-radius: 10px; background: #e3f2fd; min-width: 110px;" ] [
+                    div [ attr.style "font-size: 12px; color: #666;" ] [ text "Done" ]
+                    div [ attr.style "font-size: 22px; font-weight: bold;" ] [ text (string doneCount) ]
+                ]
+            ]
+        ) tasksVar.View
+        |> Doc.EmbedView
+
     let taskList =
         View.Map2 (fun tasks filter -> tasks, filter) tasksVar.View filterVar.View
         |> Doc.BindView (fun (tasks, filter) ->
-            tasks
-            |> getFilteredTasks filter
-            |> List.map (fun t ->
-                div [ attr.style "margin-bottom: 10px;" ] [
-                    span [
-                        attr.style (
-                            if t.IsDone then "text-decoration: line-through; margin-right: 10px;"
-                            else "margin-right: 10px;"
-                        )
-                    ] [
-                        text (t.Title + " | " + t.Subject + " | " + priorityToString t.Priority)
-                    ]
+            let filtered = getFilteredTasks filter tasks
 
-                    button [
-                        on.click (fun _ _ -> toggleTask t.Id)
-                        attr.style "margin-right: 6px;"
-                    ] [
-                        text (if t.IsDone then "Undo" else "Done")
-                    ]
-
-                    button [
-                        on.click (fun _ _ -> deleteTask t.Id)
-                    ] [
-                        text "Delete"
-                    ]
+            if List.isEmpty filtered then
+                div [
+                    attr.style "padding: 18px; border-radius: 10px; background: #fafafa; color: #666;"
+                ] [
+                    text "No tasks in this view."
                 ]
-            )
-            |> Doc.Concat
+            else
+                filtered
+                |> List.map (fun t ->
+                    div [
+                        attr.style "margin-bottom: 12px; padding: 14px; border: 1px solid #e0e0e0; border-radius: 12px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.06);"
+                    ] [
+                        div [ attr.style "display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;" ] [
+                            div [] [
+                                div [
+                                    attr.style (
+                                        if t.IsDone then
+                                            "font-size: 18px; font-weight: bold; text-decoration: line-through; color: #777; margin-bottom: 4px;"
+                                        else
+                                            "font-size: 18px; font-weight: bold; margin-bottom: 4px;"
+                                    )
+                                ] [
+                                    text t.Title
+                                ]
+
+                                div [ attr.style "color: #555; margin-bottom: 6px;" ] [
+                                    text ("Subject: " + t.Subject)
+                                ]
+
+                                span [
+                                    attr.style ("display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: bold; color: white; background: " + priorityColor t.Priority + ";")
+                                ] [
+                                    text (priorityToString t.Priority)
+                                ]
+                            ]
+
+                            div [] [
+                                button [
+                                    on.click (fun _ _ -> toggleTask t.Id)
+                                    attr.style "margin-right: 8px; padding: 8px 12px; border-radius: 8px; border: none; background: #424242; color: white; cursor: pointer;"
+                                ] [
+                                    text (if t.IsDone then "Undo" else "Done")
+                                ]
+
+                                button [
+                                    on.click (fun _ _ -> deleteTask t.Id)
+                                    attr.style "padding: 8px 12px; border-radius: 8px; border: none; background: #d32f2f; color: white; cursor: pointer;"
+                                ] [
+                                    text "Delete"
+                                ]
+                            ]
+                        ]
+                    ]
+                )
+                |> Doc.Concat
         )
 
-    div [] [
-        h1 [] [ text "StudyFlow" ]
-
-        h3 [] [ text "Add new task" ]
-
-        div [ attr.style "margin-bottom: 6px;" ] [
-            Doc.InputType.Text [ attr.placeholder "Task title" ] titleVar
+    div [
+        attr.style "max-width: 900px; margin: 40px auto; padding: 24px; font-family: Arial, sans-serif; background: #fcfcfc;"
+    ] [
+        div [
+            attr.style "background: linear-gradient(135deg, #1976d2, #42a5f5); color: white; padding: 24px; border-radius: 16px; margin-bottom: 24px;"
+        ] [
+            h1 [ attr.style "margin: 0 0 8px 0;" ] [ text "StudyFlow" ]
+            p [ attr.style "margin: 0; font-size: 16px;" ] [
+                text "A simple study task manager built with F# and WebSharper."
+            ]
         ]
 
-        div [ attr.style "margin-bottom: 6px;" ] [
-            Doc.InputType.Text [ attr.placeholder "Subject" ] subjectVar
-        ]
+        statsPanel
 
-        priorityButtons
-        selectedPriorityText
+        div [
+            attr.style "background: white; padding: 20px; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 24px;"
+        ] [
+            h3 [ attr.style "margin-top: 0;" ] [ text "Add new task" ]
 
-        div [ attr.style "margin-bottom: 20px;" ] [
-            button [
-                on.click (fun _ _ -> addTask ())
-            ] [ text "Add" ]
+            div [ attr.style "margin-bottom: 10px;" ] [
+                Doc.InputType.Text [
+                    attr.placeholder "Task title"
+                    attr.style "width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cccccc; box-sizing: border-box;"
+                ] titleVar
+            ]
+
+            div [ attr.style "margin-bottom: 10px;" ] [
+                Doc.InputType.Text [
+                    attr.placeholder "Subject"
+                    attr.style "width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cccccc; box-sizing: border-box;"
+                ] subjectVar
+            ]
+
+            priorityButtons
+            selectedPriorityText
+
+            div [] [
+                button [
+                    on.click (fun _ _ -> addTask ())
+                    attr.style "padding: 10px 16px; border-radius: 8px; border: none; background: #1976d2; color: white; font-weight: bold; cursor: pointer;"
+                ] [ text "Add task" ]
+            ]
         ]
 
         filterButtons
