@@ -103,27 +103,122 @@ let Main () =
         | Active -> tasks |> List.filter (fun t -> not t.IsDone)
         | Done -> tasks |> List.filter (fun t -> t.IsDone)
 
-    let priorityButton label value =
-        button [
-            on.click (fun _ _ -> priorityVar.Value <- value)
-            attr.style (
-                if priorityVar.Value = value then
-                    "margin-right: 6px; font-weight: bold;"
-                else
-                    "margin-right: 6px;"
-            )
-        ] [ text label ]
+    let priorityButtons =
+        priorityVar.View
+        |> Doc.BindView (fun currentPriority ->
+            div [ attr.style "margin-bottom: 6px;" ] [
+                text "Priority: "
 
-    let filterButton label value =
-        button [
-            on.click (fun _ _ -> filterVar.Value <- value)
-            attr.style (
-                if filterVar.Value = value then
-                    "margin-right: 6px; font-weight: bold;"
-                else
-                    "margin-right: 6px;"
+                button [
+                    on.click (fun _ _ -> priorityVar.Value <- Low)
+                    attr.style (
+                        if currentPriority = Low then
+                            "margin-right: 6px; font-weight: bold;"
+                        else
+                            "margin-right: 6px;"
+                    )
+                ] [ text "Low" ]
+
+                button [
+                    on.click (fun _ _ -> priorityVar.Value <- Medium)
+                    attr.style (
+                        if currentPriority = Medium then
+                            "margin-right: 6px; font-weight: bold;"
+                        else
+                            "margin-right: 6px;"
+                    )
+                ] [ text "Medium" ]
+
+                button [
+                    on.click (fun _ _ -> priorityVar.Value <- High)
+                    attr.style (
+                        if currentPriority = High then
+                            "margin-right: 6px; font-weight: bold;"
+                        else
+                            "margin-right: 6px;"
+                    )
+                ] [ text "High" ]
+            ]
+        )
+
+    let selectedPriorityText =
+        priorityVar.View
+        |> Doc.BindView (fun currentPriority ->
+            div [ attr.style "margin-bottom: 10px;" ] [
+                text ("Selected priority: " + priorityToString currentPriority)
+            ]
+        )
+
+    let filterButtons =
+        filterVar.View
+        |> Doc.BindView (fun currentFilter ->
+            div [ attr.style "margin-bottom: 20px;" ] [
+                text "Filter: "
+
+                button [
+                    on.click (fun _ _ -> filterVar.Value <- All)
+                    attr.style (
+                        if currentFilter = All then
+                            "margin-right: 6px; font-weight: bold;"
+                        else
+                            "margin-right: 6px;"
+                    )
+                ] [ text "All" ]
+
+                button [
+                    on.click (fun _ _ -> filterVar.Value <- Active)
+                    attr.style (
+                        if currentFilter = Active then
+                            "margin-right: 6px; font-weight: bold;"
+                        else
+                            "margin-right: 6px;"
+                    )
+                ] [ text "Active" ]
+
+                button [
+                    on.click (fun _ _ -> filterVar.Value <- Done)
+                    attr.style (
+                        if currentFilter = Done then
+                            "margin-right: 6px; font-weight: bold;"
+                        else
+                            "margin-right: 6px;"
+                    )
+                ] [ text "Done" ]
+            ]
+        )
+
+    let taskList =
+        View.Map2 (fun tasks filter -> tasks, filter) tasksVar.View filterVar.View
+        |> Doc.BindView (fun (tasks, filter) ->
+            tasks
+            |> getFilteredTasks filter
+            |> List.map (fun t ->
+                div [ attr.style "margin-bottom: 10px;" ] [
+                    span [
+                        attr.style (
+                            if t.IsDone then "text-decoration: line-through; margin-right: 10px;"
+                            else "margin-right: 10px;"
+                        )
+                    ] [
+                        text (t.Title + " | " + t.Subject + " | " + priorityToString t.Priority)
+                    ]
+
+                    button [
+                        on.click (fun _ _ -> toggleTask t.Id)
+                        attr.style "margin-right: 6px;"
+                    ] [
+                        text (if t.IsDone then "Undo" else "Done")
+                    ]
+
+                    button [
+                        on.click (fun _ _ -> deleteTask t.Id)
+                    ] [
+                        text "Delete"
+                    ]
+                ]
             )
-        ] [ text label ]
+            |> Doc.Concat
+        )
 
     div [] [
         h1 [] [ text "StudyFlow" ]
@@ -138,16 +233,8 @@ let Main () =
             Doc.InputType.Text [ attr.placeholder "Subject" ] subjectVar
         ]
 
-        div [ attr.style "margin-bottom: 6px;" ] [
-            text "Priority: "
-            priorityButton "Low" Low
-            priorityButton "Medium" Medium
-            priorityButton "High" High
-        ]
-
-        div [ attr.style "margin-bottom: 10px;" ] [
-            text ("Selected priority: " + priorityToString priorityVar.Value)
-        ]
+        priorityButtons
+        selectedPriorityText
 
         div [ attr.style "margin-bottom: 20px;" ] [
             button [
@@ -155,47 +242,12 @@ let Main () =
             ] [ text "Add" ]
         ]
 
-        div [ attr.style "margin-bottom: 20px;" ] [
-            text "Filter: "
-            filterButton "All" All
-            filterButton "Active" Active
-            filterButton "Done" Done
-        ]
+        filterButtons
 
         h3 [] [ text "Task list" ]
 
         div [] [
-            View.Map2 (fun tasks filter -> tasks, filter) tasksVar.View filterVar.View
-            |> Doc.BindView (fun (tasks, filter) ->
-                tasks
-                |> getFilteredTasks filter
-                |> List.map (fun t ->
-                    div [ attr.style "margin-bottom: 10px;" ] [
-                        span [
-                            attr.style (
-                                if t.IsDone then "text-decoration: line-through; margin-right: 10px;"
-                                else "margin-right: 10px;"
-                            )
-                        ] [
-                            text (t.Title + " | " + t.Subject + " | " + priorityToString t.Priority)
-                        ]
-
-                        button [
-                            on.click (fun _ _ -> toggleTask t.Id)
-                            attr.style "margin-right: 6px;"
-                        ] [
-                            text (if t.IsDone then "Undo" else "Done")
-                        ]
-
-                        button [
-                            on.click (fun _ _ -> deleteTask t.Id)
-                        ] [
-                            text "Delete"
-                        ]
-                    ]
-                )
-                |> Doc.Concat
-            )
+            taskList
         ]
     ]
     |> Doc.RunById "main"

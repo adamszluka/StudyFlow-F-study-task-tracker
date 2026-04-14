@@ -11,9 +11,23 @@ function Main(){
   const filterVar=_c.Create_1(All);
   const nextIdVar=_c.Create_1(3);
   const tasksVar=_c.Create_1(ofArray([New(1, "Math homework", "Mathematics", High, false), New(2, "F# assignment", "Functional Programming", Medium, false)]));
-  const priorityButton=(label, value) => Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(value)), Attr.Create("style", Equals(priorityVar.Get(), value)?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode(label)]);
-  const filterButton=(label, value) => Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(value)), Attr.Create("style", Equals(filterVar.Get(), value)?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode(label)]);
-  const _1=Doc.Element("div", [], [Doc.Element("h1", [], [Doc.TextNode("StudyFlow")]), Doc.Element("h3", [], [Doc.TextNode("Add new task")]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.Input([Attr.Create("placeholder", "Task title")], titleVar)]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.Input([Attr.Create("placeholder", "Subject")], subjectVar)]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.TextNode("Priority: "), priorityButton("Low", Low), priorityButton("Medium", Medium), priorityButton("High", High)]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.TextNode("Selected priority: "+priorityToString(priorityVar.Get()))]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 20px;")], [Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
+  const priorityButtons=Doc.BindView((currentPriority) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.TextNode("Priority: "), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(Low)), Attr.Create("style", currentPriority.$===0?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("Low")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(Medium)), Attr.Create("style", currentPriority.$===1?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("Medium")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(High)), Attr.Create("style", currentPriority.$===2?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("High")])]), priorityVar.View);
+  const selectedPriorityText=Doc.BindView((currentPriority) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.TextNode("Selected priority: "+priorityToString(currentPriority))]), priorityVar.View);
+  const filterButtons=Doc.BindView((currentFilter) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 20px;")], [Doc.TextNode("Filter: "), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(All)), Attr.Create("style", currentFilter.$===0?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("All")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(Active)), Attr.Create("style", currentFilter.$===1?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("Active")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(Done)), Attr.Create("style", currentFilter.$===2?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode("Done")])]), filterVar.View);
+  const taskList=Doc.BindView((_2) => {
+    const tasks=_2[0];
+    const _3=_2[1];
+    let _4=_3.$==1?filter((t) =>!t.IsDone, tasks):_3.$==2?filter((t) => t.IsDone, tasks):tasks;
+    let _5=map((t) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.Element("span", [Attr.Create("style", t.IsDone?"text-decoration: line-through; margin-right: 10px;":"margin-right: 10px;")], [Doc.TextNode(t.Title+" | "+t.Subject+" | "+priorityToString(t.Priority))]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
+      const taskId=t.Id;
+      return tasksVar.Set(map((t_1) => t_1.Id===taskId?New(t_1.Id, t_1.Title, t_1.Subject, t_1.Priority, !t_1.IsDone):t_1, tasksVar.Get()));
+    }), Attr.Create("style", "margin-right: 6px;")], [Doc.TextNode(t.IsDone?"Undo":"Done")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
+      const taskId=t.Id;
+      return tasksVar.Set(filter((t_1) => t_1.Id!==taskId, tasksVar.Get()));
+    })], [Doc.TextNode("Delete")])]), _4);
+    return Doc.Concat(_5);
+  }, Map2((_2, _3) =>[_2, _3], tasksVar.View, filterVar.View));
+  const _1=Doc.Element("div", [], [Doc.Element("h1", [], [Doc.TextNode("StudyFlow")]), Doc.Element("h3", [], [Doc.TextNode("Add new task")]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.Input([Attr.Create("placeholder", "Task title")], titleVar)]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.Input([Attr.Create("placeholder", "Subject")], subjectVar)]), priorityButtons, selectedPriorityText, Doc.Element("div", [Attr.Create("style", "margin-bottom: 20px;")], [Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
     const title=Trim(titleVar.Get());
     const subject=Trim(subjectVar.Get());
     const priority=priorityVar.Get();
@@ -26,19 +40,7 @@ function Main(){
       return priorityVar.Set(Medium);
     }
     else return null;
-  })], [Doc.TextNode("Add")])]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 20px;")], [Doc.TextNode("Filter: "), filterButton("All", All), filterButton("Active", Active), filterButton("Done", Done)]), Doc.Element("h3", [], [Doc.TextNode("Task list")]), Doc.Element("div", [], [Doc.BindView((_2) => {
-    const tasks=_2[0];
-    const _3=_2[1];
-    let _4=_3.$==1?filter((t) =>!t.IsDone, tasks):_3.$==2?filter((t) => t.IsDone, tasks):tasks;
-    let _5=map((t) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.Element("span", [Attr.Create("style", t.IsDone?"text-decoration: line-through; margin-right: 10px;":"margin-right: 10px;")], [Doc.TextNode(t.Title+" | "+t.Subject+" | "+priorityToString(t.Priority))]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
-      const taskId=t.Id;
-      return tasksVar.Set(map((t_1) => t_1.Id===taskId?New(t_1.Id, t_1.Title, t_1.Subject, t_1.Priority, !t_1.IsDone):t_1, tasksVar.Get()));
-    }), Attr.Create("style", "margin-right: 6px;")], [Doc.TextNode(t.IsDone?"Undo":"Done")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
-      const taskId=t.Id;
-      return tasksVar.Set(filter((t_1) => t_1.Id!==taskId, tasksVar.Get()));
-    })], [Doc.TextNode("Delete")])]), _4);
-    return Doc.Concat(_5);
-  }, Map2((_2, _3) =>[_2, _3], tasksVar.View, filterVar.View))])]);
+  })], [Doc.TextNode("Add")])]), filterButtons, Doc.Element("h3", [], [Doc.TextNode("Task list")]), Doc.Element("div", [], [taskList])]);
   LoadLocalTemplates("");
   Doc.RunById("main", _1);
 }
@@ -173,8 +175,6 @@ function New(Id, Title, Subject, Priority, IsDone){
     IsDone:IsDone
   };
 }
-class Var extends Object_1 { }
-class attr extends Object_1 { }
 function FailWith(msg){
   throw new Error(msg);
 }
@@ -185,145 +185,7 @@ function range(min, max_1){
   const count=1+max_1-min;
   return count<=0?[]:init(count, (x) => x+min);
 }
-function Equals(a, b){
-  if(a===b)return true;
-  else {
-    const m=typeof a;
-    if(m=="object"){
-      if(a===null||a===void 0||b===null||b===void 0||!Equals(typeof b, "object"))return false;
-      else if("Equals"in a)return a.Equals(b);
-      else if("Equals"in b)return false;
-      else if(a instanceof Array&&b instanceof Array)return arrayEquals(a, b);
-      else if(a instanceof Date&&b instanceof Date)return dateEquals(a, b);
-      else {
-        const a_1=a;
-        const b_1=b;
-        const eqR=[true];
-        let k;
-        for(var k_2 in a_1)if(((k_3) => {
-          eqR[0]=!a_1.hasOwnProperty(k_3)||b_1.hasOwnProperty(k_3)&&Equals(a_1[k_3], b_1[k_3]);
-          return!eqR[0];
-        })(k_2))break;
-        if(eqR[0]){
-          let k_1;
-          for(var k_3 in b_1)if(((k_4) => {
-            eqR[0]=!b_1.hasOwnProperty(k_4)||a_1.hasOwnProperty(k_4);
-            return!eqR[0];
-          })(k_3))break;
-        }
-        return eqR[0];
-      }
-    }
-    else return m=="function"&&("$Func"in a?a.$Func===b.$Func&&a.$Target===b.$Target:"$Invokes"in a&&"$Invokes"in b&&arrayEquals(a.$Invokes, b.$Invokes));
-  }
-}
-function arrayEquals(a, b){
-  let eq;
-  let i;
-  if(length(a)===length(b)){
-    eq=true;
-    i=0;
-    while(eq&&i<length(a))
-      {
-        !Equals(get(a, i), get(b, i))?eq=false:void 0;
-        i=i+1;
-      }
-    return eq;
-  }
-  else return false;
-}
-function dateEquals(a, b){
-  return a.getTime()===b.getTime();
-}
-function Hash(o){
-  const m=typeof o;
-  return m=="function"?0:m=="boolean"?o?1:0:m=="number"?o:m=="string"?hashString(o):m=="object"?o==null?0:o instanceof Array?hashArray(o):hashObject(o):m=="bigint"?hashString(String(o)):m=="symbol"?hashString(o.description):0;
-}
-function hashString(s){
-  let hash;
-  if(s===null)return 0;
-  else {
-    hash=5381;
-    for(let i=0, _1=s.length-1;i<=_1;i++)hash=hashMix(hash, s[i].charCodeAt());
-    return hash;
-  }
-}
-function hashArray(o){
-  let h=-34948909;
-  for(let i=0, _1=length(o)-1;i<=_1;i++)h=hashMix(h, Hash(get(o, i)));
-  return h;
-}
-function hashObject(o){
-  if("GetHashCode"in o)return o.GetHashCode();
-  else {
-    const ____=hashMix;
-    const h=[0];
-    let k;
-    for(var k_1 in o)if(((key) => {
-      h[0]=____(____(h[0], hashString(key)), Hash(o[key]));
-      return false;
-    })(k_1))break;
-    return h[0];
-  }
-}
-function hashMix(x, y){
-  return(x<<5)+x+y;
-}
-function Compare(a, b){
-  if(a===b)return 0;
-  else {
-    const m=typeof a;
-    switch(m=="boolean"?1:m=="number"?1:m=="bigint"?1:m=="string"?1:m=="object"?2:m=="function"?3:m=="symbol"?4:0){
-      case 0:
-        return typeof b=="undefined"?0:-1;
-      case 1:
-        return a<b?-1:1;
-      case 2:
-        if(a===null)return -1;
-        else if(b===null)return 1;
-        else if("CompareTo"in a)return a.CompareTo(b);
-        else if("CompareTo0"in a)return a.CompareTo0(b);
-        else if(a instanceof Array&&b instanceof Array)return compareArrays(a, b);
-        else if(a instanceof Date&&b instanceof Date)return compareDates(a, b);
-        else {
-          const a_1=a;
-          const b_1=b;
-          const cmp=[0];
-          let k;
-          for(var k_2 in a_1)if(((k_3) =>!a_1.hasOwnProperty(k_3)?false:!b_1.hasOwnProperty(k_3)?(cmp[0]=1,true):(cmp[0]=Compare(a_1[k_3], b_1[k_3]),cmp[0]!==0))(k_2))break;
-          if(cmp[0]===0){
-            let k_1;
-            for(var k_3 in b_1)if(((k_4) =>!b_1.hasOwnProperty(k_4)?false:!a_1.hasOwnProperty(k_4)&&(cmp[0]=-1,true))(k_3))break;
-          }
-          return cmp[0];
-        }
-        break;
-      case 3:
-        return FailWith("Cannot compare function values.");
-      case 4:
-        return FailWith("Cannot compare symbol values.");
-    }
-  }
-}
-function compareArrays(a, b){
-  let cmp;
-  let i;
-  if(length(a)<length(b))return -1;
-  else if(length(a)>length(b))return 1;
-  else {
-    cmp=0;
-    i=0;
-    while(cmp===0&&i<length(a))
-      {
-        cmp=Compare(get(a, i), get(b, i));
-        i=i+1;
-      }
-    return cmp;
-  }
-}
-function compareDates(a, b){
-  return Compare(a.getTime(), b.getTime());
-}
+class attr extends Object_1 { }
 function Map2(fn, a, a_1){
   return CreateLazy(() => Map2_1(fn, a(), a_1()));
 }
@@ -357,9 +219,6 @@ function Map2Unit(a, a_1){
 function Bind(fn, view){
   return Join(Map(fn, view));
 }
-function Join(a){
-  return CreateLazy(() => Join_1(a()));
-}
 function Sink(act, a){
   function loop(){
     WhenRun(a(), act, () => {
@@ -368,6 +227,10 @@ function Sink(act, a){
   }
   scheduler().Fork(loop);
 }
+function Join(a){
+  return CreateLazy(() => Join_1(a()));
+}
+class Var extends Object_1 { }
 class Doc extends Object_1 {
   docNode;
   updates;
@@ -380,6 +243,11 @@ class Doc extends Object_1 {
   static Input(attr_1, var_1){
     return Doc.InputInternal("input", () => append_1(attr_1, [Value(var_1)]));
   }
+  static RunById(id, tr){
+    const m=globalThis.document.getElementById(id);
+    if(Equals(m, null))FailWith("invalid id: "+id);
+    else Doc.Run(m, tr);
+  }
   static BindView(f, view){
     return Doc.EmbedView(Map(f, view));
   }
@@ -388,11 +256,6 @@ class Doc extends Object_1 {
   }
   static get Empty(){
     return Doc.Mk(null, Const());
-  }
-  static RunById(id, tr){
-    const m=globalThis.document.getElementById(id);
-    if(Equals(m, null))FailWith("invalid id: "+id);
-    else Doc.Run(m, tr);
   }
   static Element(name, attr_1, children){
     const a=Attr.Concat(attr_1);
@@ -406,16 +269,16 @@ class Doc extends Object_1 {
     const el=globalThis.document.createElement(elemTy);
     return Elt.New(el, Attr.Concat(attr_1(el)), Doc.Empty);
   }
+  static Run(parent, doc){
+    LinkElement(parent, doc.docNode);
+    Doc.RunInPlace(false, parent, doc);
+  }
   static EmbedView(view){
     const node=CreateEmbedNode();
     return Doc.Mk(EmbedDoc(node), Map(() => { }, Bind((doc) => {
       UpdateEmbedNode(node, doc.docNode);
       return doc.updates;
     }, view)));
-  }
-  static Run(parent, doc){
-    LinkElement(parent, doc.docNode);
-    Doc.RunInPlace(false, parent, doc);
   }
   static RunInPlace(childrenOnly, parent, doc){
     const st=CreateRunState(parent, doc.docNode);
@@ -588,6 +451,21 @@ function MarkDone(res, sn, v){
   if(_1!=null&&_1.$==0)MarkForever(res, v);
   else MarkReady(res, v);
 }
+function WhenRun(snap, avail, obs){
+  const m=snap.s;
+  if(m==null)obs();
+  else if(m!=null&&m.$==2){
+    const v=m.$0;
+    m.$1.push(obs);
+    avail(v);
+  }
+  else if(m!=null&&m.$==3){
+    const q2=m.$1;
+    m.$0.push(avail);
+    q2.push(obs);
+  }
+  else avail(m.$0);
+}
 function Join_1(snap){
   const res={s:Waiting([], [])};
   When(snap, (x) => {
@@ -605,21 +483,6 @@ function Join_1(snap){
     }, res);
   }, res);
   return res;
-}
-function WhenRun(snap, avail, obs){
-  const m=snap.s;
-  if(m==null)obs();
-  else if(m!=null&&m.$==2){
-    const v=m.$0;
-    m.$1.push(obs);
-    avail(v);
-  }
-  else if(m!=null&&m.$==3){
-    const q2=m.$1;
-    m.$0.push(avail);
-    q2.push(obs);
-  }
-  else avail(m.$0);
 }
 function Copy(sn){
   const m=sn.s;
@@ -683,14 +546,14 @@ function set(arr, n, x){
   arr[n]=x;
 }
 class Attr {
-  static HandlerImpl(event, q){
-    return Attr.A3((el) => {
-      el.addEventListener(event, (d) =>(q(el))(d), false);
-    });
-  }
   static Create(name, value){
     return Attr.A3((el) => {
       el.setAttribute(name, value);
+    });
+  }
+  static HandlerImpl(event, q){
+    return Attr.A3((el) => {
+      el.addEventListener(event, (d) =>(q(el))(d), false);
     });
   }
   static Concat(xs){
@@ -729,69 +592,6 @@ function NewFromSeq(fields){
     if(typeof _1=="object"&&isIDisposable(_1))e.Dispose();
   }
   return r;
-}
-function GetFieldValues(o){
-  let r=[];
-  let k;
-  for(var k_1 in o)r.push(o[k_1]);
-  return r;
-}
-function TryParse(s, r){
-  return TryParse_2(s, -2147483648, 2147483647, r);
-}
-function ofSeqNonCopying(xs){
-  if(xs instanceof Array)return xs;
-  else if(xs instanceof FSharpList)return ofList(xs);
-  else if(xs===null)return[];
-  else {
-    const q=[];
-    const o=Get(xs);
-    try {
-      while(o.MoveNext())
-        q.push(o.Current);
-      return q;
-    }
-    finally {
-      const _1=o;
-      if(typeof _1=="object"&&isIDisposable(_1))o.Dispose();
-    }
-  }
-}
-function TreeReduce(defaultValue, reduction, array){
-  const l=length(array);
-  function loop(off){
-    return(len) => {
-      let _1;
-      switch(len<=0?0:len===1?off>=0&&off<l?1:(_1=len,2):(_1=len,2)){
-        case 0:
-          return defaultValue;
-        case 1:
-          return get(array, off);
-        case 2:
-          const l2=len/2>>0;
-          return reduction((loop(off))(l2), (loop(off+l2))(len-l2));
-      }
-    };
-  }
-  return(loop(0))(l);
-}
-function MapTreeReduce(mapping, defaultValue, reduction, array){
-  const l=length(array);
-  function loop(off){
-    return(len) => {
-      let _1;
-      switch(len<=0?0:len===1?off>=0&&off<l?1:(_1=len,2):(_1=len,2)){
-        case 0:
-          return defaultValue;
-        case 1:
-          return mapping(get(array, off));
-        case 2:
-          const l2=len/2>>0;
-          return reduction((loop(off))(l2), (loop(off+l2))(len-l2));
-      }
-    };
-  }
-  return(loop(0))(l);
 }
 function LoadLocalTemplates(baseName){
   !LocalTemplatesLoaded()?(set_LocalTemplatesLoaded(true),LoadNestedTemplates(globalThis.document.body, "")):void 0;
@@ -1082,6 +882,63 @@ function PrepareSingleTemplate(baseName, name, el){
 function TextHoleRE(){
   return _c_1.TextHoleRE;
 }
+function TryParse(s, r){
+  return TryParse_2(s, -2147483648, 2147483647, r);
+}
+function ofSeqNonCopying(xs){
+  if(xs instanceof Array)return xs;
+  else if(xs instanceof FSharpList)return ofList(xs);
+  else if(xs===null)return[];
+  else {
+    const q=[];
+    const o=Get(xs);
+    try {
+      while(o.MoveNext())
+        q.push(o.Current);
+      return q;
+    }
+    finally {
+      const _1=o;
+      if(typeof _1=="object"&&isIDisposable(_1))o.Dispose();
+    }
+  }
+}
+function TreeReduce(defaultValue, reduction, array){
+  const l=length(array);
+  function loop(off){
+    return(len) => {
+      let _1;
+      switch(len<=0?0:len===1?off>=0&&off<l?1:(_1=len,2):(_1=len,2)){
+        case 0:
+          return defaultValue;
+        case 1:
+          return get(array, off);
+        case 2:
+          const l2=len/2>>0;
+          return reduction((loop(off))(l2), (loop(off+l2))(len-l2));
+      }
+    };
+  }
+  return(loop(0))(l);
+}
+function MapTreeReduce(mapping, defaultValue, reduction, array){
+  const l=length(array);
+  function loop(off){
+    return(len) => {
+      let _1;
+      switch(len<=0?0:len===1?off>=0&&off<l?1:(_1=len,2):(_1=len,2)){
+        case 0:
+          return defaultValue;
+        case 1:
+          return mapping(get(array, off));
+        case 2:
+          const l2=len/2>>0;
+          return reduction((loop(off))(l2), (loop(off+l2))(len-l2));
+      }
+    };
+  }
+  return(loop(0))(l);
+}
 function Trim(s){
   return s.replace(new RegExp("^\\s+"), "").replace(new RegExp("\\s+$"), "");
 }
@@ -1135,6 +992,83 @@ function Waiting(Item1, Item2){
     $0:Item1, 
     $1:Item2
   };
+}
+function ParseHTMLIntoFakeRoot(elem){
+  const root=globalThis.document.createElement("div");
+  if(!rhtml().test(elem)){
+    root.appendChild(globalThis.document.createTextNode(elem));
+    return root;
+  }
+  else {
+    const m=rtagName().exec(elem);
+    const tag=Equals(m, null)?"":get(m, 1).toLowerCase();
+    const w=(wrapMap())[tag];
+    const p=w?w:defaultWrap();
+    root.innerHTML=p[1]+elem.replace(rxhtmlTag(), "<$1></$2>")+p[2];
+    function unwrap(elt, a){
+      while(true)
+        {
+          if(a===0)return elt;
+          else {
+            const i=a;
+            elt=elt.lastChild;
+            a=i-1;
+          }
+        }
+    }
+    return(((a) => {
+      const _1=a;
+      return(_2) => unwrap(_1, _2);
+    })(root))(p[0]);
+  }
+}
+function rhtml(){
+  return _c_5.rhtml;
+}
+function wrapMap(){
+  return _c_5.wrapMap;
+}
+function defaultWrap(){
+  return _c_5.defaultWrap;
+}
+function rxhtmlTag(){
+  return _c_5.rxhtmlTag;
+}
+function rtagName(){
+  return _c_5.rtagName;
+}
+function IterSelector(el, selector, f){
+  const l=el.querySelectorAll(selector);
+  for(let i=0, _1=l.length-1;i<=_1;i++)f(l[i]);
+}
+function InsertAt(parent, pos, node){
+  let _1;
+  if(node.parentNode===parent){
+    const m=node.nextSibling;
+    let _2=Equals(m, null)?null:m;
+    _1=pos===_2;
+  }
+  else _1=false;
+  if(!_1)parent.insertBefore(node, pos);
+}
+function RemoveNode(parent, el){
+  if(el.parentNode===parent)parent.removeChild(el);
+}
+function TextNodeDoc(Item){
+  return{$:5, $0:Item};
+}
+function AppendDoc(Item1, Item2){
+  return{
+    $:0, 
+    $0:Item1, 
+    $1:Item2
+  };
+}
+function EmbedDoc(Item){
+  return{$:2, $0:Item};
+}
+function ElemDoc(Item){
+  return{$:1, $0:Item};
 }
 function Updates(dyn){
   return MapTreeReduce((x) => x.NChanged, Const(), Map2Unit, dyn.DynNodes);
@@ -1216,83 +1150,6 @@ function Sync(elem, dyn){
   iter_1((d) => {
     d.NSync(elem);
   }, dyn.DynNodes);
-}
-function ParseHTMLIntoFakeRoot(elem){
-  const root=globalThis.document.createElement("div");
-  if(!rhtml().test(elem)){
-    root.appendChild(globalThis.document.createTextNode(elem));
-    return root;
-  }
-  else {
-    const m=rtagName().exec(elem);
-    const tag=Equals(m, null)?"":get(m, 1).toLowerCase();
-    const w=(wrapMap())[tag];
-    const p=w?w:defaultWrap();
-    root.innerHTML=p[1]+elem.replace(rxhtmlTag(), "<$1></$2>")+p[2];
-    function unwrap(elt, a){
-      while(true)
-        {
-          if(a===0)return elt;
-          else {
-            const i=a;
-            elt=elt.lastChild;
-            a=i-1;
-          }
-        }
-    }
-    return(((a) => {
-      const _1=a;
-      return(_2) => unwrap(_1, _2);
-    })(root))(p[0]);
-  }
-}
-function rhtml(){
-  return _c_5.rhtml;
-}
-function wrapMap(){
-  return _c_5.wrapMap;
-}
-function defaultWrap(){
-  return _c_5.defaultWrap;
-}
-function rxhtmlTag(){
-  return _c_5.rxhtmlTag;
-}
-function rtagName(){
-  return _c_5.rtagName;
-}
-function IterSelector(el, selector, f){
-  const l=el.querySelectorAll(selector);
-  for(let i=0, _1=l.length-1;i<=_1;i++)f(l[i]);
-}
-function InsertAt(parent, pos, node){
-  let _1;
-  if(node.parentNode===parent){
-    const m=node.nextSibling;
-    let _2=Equals(m, null)?null:m;
-    _1=pos===_2;
-  }
-  else _1=false;
-  if(!_1)parent.insertBefore(node, pos);
-}
-function RemoveNode(parent, el){
-  if(el.parentNode===parent)parent.removeChild(el);
-}
-function TextNodeDoc(Item){
-  return{$:5, $0:Item};
-}
-function AppendDoc(Item1, Item2){
-  return{
-    $:0, 
-    $0:Item1, 
-    $1:Item2
-  };
-}
-function EmbedDoc(Item){
-  return{$:2, $0:Item};
-}
-function ElemDoc(Item){
-  return{$:1, $0:Item};
 }
 function append_1(s1, s2){
   return{GetEnumerator:() => {
@@ -1472,6 +1329,249 @@ function ValueWith(bind, var_1){
 function DynamicCustom(set_1, view){
   return Dynamic(view, set_1);
 }
+function GetFieldValues(o){
+  let r=[];
+  let k;
+  for(var k_1 in o)r.push(o[k_1]);
+  return r;
+}
+class Dictionary extends Object_1 {
+  equals;
+  hash;
+  count;
+  data;
+  set_Item(k, v){
+    this.set(k, v);
+  }
+  ContainsKey(k){
+    const d=this.data[this.hash(k)];
+    return d==null?false:exists_1((a) => this.equals.apply(null, [(KeyValue(a))[0], k]), d);
+  }
+  TryGetValue(k, res){
+    const d=this.data[this.hash(k)];
+    if(d==null)return false;
+    else {
+      const v=tryPick((a) => {
+        const a_1=KeyValue(a);
+        return this.equals.apply(null, [a_1[0], k])?Some(a_1[1]):null;
+      }, d);
+      return v!=null&&v.$==1&&(res.set(v.$0),true);
+    }
+  }
+  RemoveKey(k){
+    return this.remove(k);
+  }
+  get Keys(){
+    return new KeyCollection(this);
+  }
+  set(k, v){
+    const h=this.hash(k);
+    const d=this.data[h];
+    if(d==null){
+      this.count=this.count+1;
+      this.data[h]=new Array({K:k, V:v});
+    }
+    else {
+      const m=tryFindIndex((a) => this.equals.apply(null, [(KeyValue(a))[0], k]), d);
+      if(m==null){
+        this.count=this.count+1;
+        d.push({K:k, V:v});
+      }
+      else d[m.$0]={K:k, V:v};
+    }
+  }
+  remove(k){
+    const h=this.hash(k);
+    const d=this.data[h];
+    if(d==null)return false;
+    else {
+      const r=filter_1((a) =>!this.equals.apply(null, [(KeyValue(a))[0], k]), d);
+      return length(r)<d.length&&(this.count=this.count-1,this.data[h]=r,true);
+    }
+  }
+  Item(k){
+    return this.get(k);
+  }
+  GetEnumerator(){
+    return Get0(concat_2(GetFieldValues(this.data)));
+  }
+  get(k){
+    const d=this.data[this.hash(k)];
+    return d==null?notPresent():pick((a) => {
+      const a_1=KeyValue(a);
+      return this.equals.apply(null, [a_1[0], k])?Some(a_1[1]):null;
+    }, d);
+  }
+  constructor(i, _1, _2, _3){
+    if(i=="New_5"){
+      i="New_6";
+      _1=[];
+      _2=Equals;
+      _3=Hash;
+    }
+    if(i=="New_6"){
+      const init_2=_1;
+      const equals=_2;
+      const hash=_3;
+      super();
+      this.equals=equals;
+      this.hash=hash;
+      this.count=0;
+      this.data=[];
+      const e=Get(init_2);
+      try {
+        while(e.MoveNext())
+          {
+            const x=e.Current;
+            this.set(x.K, x.V);
+          }
+      }
+      finally {
+        const _4=e;
+        if(typeof _4=="object"&&isIDisposable(_4))e.Dispose();
+      }
+    }
+  }
+}
+function Equals(a, b){
+  if(a===b)return true;
+  else {
+    const m=typeof a;
+    if(m=="object"){
+      if(a===null||a===void 0||b===null||b===void 0||!Equals(typeof b, "object"))return false;
+      else if("Equals"in a)return a.Equals(b);
+      else if("Equals"in b)return false;
+      else if(a instanceof Array&&b instanceof Array)return arrayEquals(a, b);
+      else if(a instanceof Date&&b instanceof Date)return dateEquals(a, b);
+      else {
+        const a_1=a;
+        const b_1=b;
+        const eqR=[true];
+        let k;
+        for(var k_2 in a_1)if(((k_3) => {
+          eqR[0]=!a_1.hasOwnProperty(k_3)||b_1.hasOwnProperty(k_3)&&Equals(a_1[k_3], b_1[k_3]);
+          return!eqR[0];
+        })(k_2))break;
+        if(eqR[0]){
+          let k_1;
+          for(var k_3 in b_1)if(((k_4) => {
+            eqR[0]=!b_1.hasOwnProperty(k_4)||a_1.hasOwnProperty(k_4);
+            return!eqR[0];
+          })(k_3))break;
+        }
+        return eqR[0];
+      }
+    }
+    else return m=="function"&&("$Func"in a?a.$Func===b.$Func&&a.$Target===b.$Target:"$Invokes"in a&&"$Invokes"in b&&arrayEquals(a.$Invokes, b.$Invokes));
+  }
+}
+function arrayEquals(a, b){
+  let eq;
+  let i;
+  if(length(a)===length(b)){
+    eq=true;
+    i=0;
+    while(eq&&i<length(a))
+      {
+        !Equals(get(a, i), get(b, i))?eq=false:void 0;
+        i=i+1;
+      }
+    return eq;
+  }
+  else return false;
+}
+function dateEquals(a, b){
+  return a.getTime()===b.getTime();
+}
+function Hash(o){
+  const m=typeof o;
+  return m=="function"?0:m=="boolean"?o?1:0:m=="number"?o:m=="string"?hashString(o):m=="object"?o==null?0:o instanceof Array?hashArray(o):hashObject(o):m=="bigint"?hashString(String(o)):m=="symbol"?hashString(o.description):0;
+}
+function hashString(s){
+  let hash;
+  if(s===null)return 0;
+  else {
+    hash=5381;
+    for(let i=0, _1=s.length-1;i<=_1;i++)hash=hashMix(hash, s[i].charCodeAt());
+    return hash;
+  }
+}
+function hashArray(o){
+  let h=-34948909;
+  for(let i=0, _1=length(o)-1;i<=_1;i++)h=hashMix(h, Hash(get(o, i)));
+  return h;
+}
+function hashObject(o){
+  if("GetHashCode"in o)return o.GetHashCode();
+  else {
+    const ____=hashMix;
+    const h=[0];
+    let k;
+    for(var k_1 in o)if(((key) => {
+      h[0]=____(____(h[0], hashString(key)), Hash(o[key]));
+      return false;
+    })(k_1))break;
+    return h[0];
+  }
+}
+function hashMix(x, y){
+  return(x<<5)+x+y;
+}
+function Compare(a, b){
+  if(a===b)return 0;
+  else {
+    const m=typeof a;
+    switch(m=="boolean"?1:m=="number"?1:m=="bigint"?1:m=="string"?1:m=="object"?2:m=="function"?3:m=="symbol"?4:0){
+      case 0:
+        return typeof b=="undefined"?0:-1;
+      case 1:
+        return a<b?-1:1;
+      case 2:
+        if(a===null)return -1;
+        else if(b===null)return 1;
+        else if("CompareTo"in a)return a.CompareTo(b);
+        else if("CompareTo0"in a)return a.CompareTo0(b);
+        else if(a instanceof Array&&b instanceof Array)return compareArrays(a, b);
+        else if(a instanceof Date&&b instanceof Date)return compareDates(a, b);
+        else {
+          const a_1=a;
+          const b_1=b;
+          const cmp=[0];
+          let k;
+          for(var k_2 in a_1)if(((k_3) =>!a_1.hasOwnProperty(k_3)?false:!b_1.hasOwnProperty(k_3)?(cmp[0]=1,true):(cmp[0]=Compare(a_1[k_3], b_1[k_3]),cmp[0]!==0))(k_2))break;
+          if(cmp[0]===0){
+            let k_1;
+            for(var k_3 in b_1)if(((k_4) =>!b_1.hasOwnProperty(k_4)?false:!a_1.hasOwnProperty(k_4)&&(cmp[0]=-1,true))(k_3))break;
+          }
+          return cmp[0];
+        }
+        break;
+      case 3:
+        return FailWith("Cannot compare function values.");
+      case 4:
+        return FailWith("Cannot compare symbol values.");
+    }
+  }
+}
+function compareArrays(a, b){
+  let cmp;
+  let i;
+  if(length(a)<length(b))return -1;
+  else if(length(a)>length(b))return 1;
+  else {
+    cmp=0;
+    i=0;
+    while(cmp===0&&i<length(a))
+      {
+        cmp=Compare(get(a, i), get(b, i));
+        i=i+1;
+      }
+    return cmp;
+  }
+}
+function compareDates(a, b){
+  return Compare(a.getTime(), b.getTime());
+}
 function Obsolete(sn){
   let _1;
   const m=sn.s;
@@ -1600,104 +1700,6 @@ function forall_2(f, x){
     if(f(x[i]))i=i+1;
     else a=false;
   return a;
-}
-class Dictionary extends Object_1 {
-  equals;
-  hash;
-  count;
-  data;
-  set_Item(k, v){
-    this.set(k, v);
-  }
-  ContainsKey(k){
-    const d=this.data[this.hash(k)];
-    return d==null?false:exists_1((a) => this.equals.apply(null, [(KeyValue(a))[0], k]), d);
-  }
-  TryGetValue(k, res){
-    const d=this.data[this.hash(k)];
-    if(d==null)return false;
-    else {
-      const v=tryPick((a) => {
-        const a_1=KeyValue(a);
-        return this.equals.apply(null, [a_1[0], k])?Some(a_1[1]):null;
-      }, d);
-      return v!=null&&v.$==1&&(res.set(v.$0),true);
-    }
-  }
-  RemoveKey(k){
-    return this.remove(k);
-  }
-  get Keys(){
-    return new KeyCollection(this);
-  }
-  set(k, v){
-    const h=this.hash(k);
-    const d=this.data[h];
-    if(d==null){
-      this.count=this.count+1;
-      this.data[h]=new Array({K:k, V:v});
-    }
-    else {
-      const m=tryFindIndex((a) => this.equals.apply(null, [(KeyValue(a))[0], k]), d);
-      if(m==null){
-        this.count=this.count+1;
-        d.push({K:k, V:v});
-      }
-      else d[m.$0]={K:k, V:v};
-    }
-  }
-  remove(k){
-    const h=this.hash(k);
-    const d=this.data[h];
-    if(d==null)return false;
-    else {
-      const r=filter_1((a) =>!this.equals.apply(null, [(KeyValue(a))[0], k]), d);
-      return length(r)<d.length&&(this.count=this.count-1,this.data[h]=r,true);
-    }
-  }
-  Item(k){
-    return this.get(k);
-  }
-  GetEnumerator(){
-    return Get0(concat_2(GetFieldValues(this.data)));
-  }
-  get(k){
-    const d=this.data[this.hash(k)];
-    return d==null?notPresent():pick((a) => {
-      const a_1=KeyValue(a);
-      return this.equals.apply(null, [a_1[0], k])?Some(a_1[1]):null;
-    }, d);
-  }
-  constructor(i, _1, _2, _3){
-    if(i=="New_5"){
-      i="New_6";
-      _1=[];
-      _2=Equals;
-      _3=Hash;
-    }
-    if(i=="New_6"){
-      const init_2=_1;
-      const equals=_2;
-      const hash=_3;
-      super();
-      this.equals=equals;
-      this.hash=hash;
-      this.count=0;
-      this.data=[];
-      const e=Get(init_2);
-      try {
-        while(e.MoveNext())
-          {
-            const x=e.Current;
-            this.set(x.K, x.V);
-          }
-      }
-      finally {
-        const _4=e;
-        if(typeof _4=="object"&&isIDisposable(_4))e.Dispose();
-      }
-    }
-  }
 }
 function Get(x){
   return x instanceof Array?ArrayEnumerator(x):Equals(typeof x, "string")?StringEnumerator(x):x.GetEnumerator();
@@ -1835,8 +1837,136 @@ function FloatSetChecked(){
 function FloatGetChecked(){
   return _c_3.FloatGetChecked;
 }
+let _c_1=Lazy((_i) => class $StartupCode_Templates {
+  static {
+    _c_1=_i(this);
+  }
+  static RenderedFullDocTemplate;
+  static TextHoleRE;
+  static GlobalHoles;
+  static LocalTemplatesLoaded;
+  static LoadedTemplates;
+  static {
+    this.LoadedTemplates=new Dictionary("New_5");
+    this.LocalTemplatesLoaded=false;
+    this.GlobalHoles=new Dictionary("New_5");
+    this.TextHoleRE="\\${([^}]+)}";
+    this.RenderedFullDocTemplate=null;
+  }
+});
+class HashSet extends Object_1 {
+  equals;
+  hash;
+  data;
+  count;
+  SAdd(item){
+    return this.add(item);
+  }
+  Contains(item){
+    const arr=this.data[this.hash(item)];
+    return arr==null?false:this.arrContains(item, arr);
+  }
+  add(item){
+    const h=this.hash(item);
+    const arr=this.data[h];
+    return arr==null?(this.data[h]=[item],this.count=this.count+1,true):this.arrContains(item, arr)?false:(arr.push(item),this.count=this.count+1,true);
+  }
+  arrContains(item, arr){
+    let c=true;
+    let i=0;
+    const l=arr.length;
+    while(c&&i<l)
+      if(this.equals.apply(null, [arr[i], item]))c=false;
+      else i=i+1;
+    return!c;
+  }
+  GetEnumerator(){
+    return Get(concat_3(this.data));
+  }
+  ExceptWith(xs){
+    const e=Get(xs);
+    try {
+      while(e.MoveNext())
+        this.Remove(e.Current);
+    }
+    finally {
+      const _1=e;
+      if(typeof _1=="object"&&isIDisposable(_1))e.Dispose();
+    }
+  }
+  get Count(){
+    return this.count;
+  }
+  IntersectWith(xs){
+    const other=new HashSet("New_4", xs, this.equals, this.hash);
+    const all=concat_3(this.data);
+    for(let i=0, _1=all.length-1;i<=_1;i++){
+      const item=all[i];
+      if(!other.Contains(item))this.Remove(item);
+    }
+  }
+  Remove(item){
+    const arr=this.data[this.hash(item)];
+    return arr==null?false:this.arrRemove(item, arr)&&(this.count=this.count-1,true);
+  }
+  CopyTo(arr, index){
+    const all=concat_3(this.data);
+    for(let i=0, _1=all.length-1;i<=_1;i++)set(arr, i+index, all[i]);
+  }
+  arrRemove(item, arr){
+    let c=true;
+    let i=0;
+    const l=arr.length;
+    while(c&&i<l)
+      if(this.equals.apply(null, [arr[i], item])){
+        arr.splice(i, 1);
+        c=false;
+      }
+      else i=i+1;
+    return!c;
+  }
+  constructor(i, _1, _2, _3){
+    if(i=="New_3"){
+      i="New_4";
+      _1=[];
+      _2=Equals;
+      _3=Hash;
+    }
+    let init_2;
+    if(i=="New_2"){
+      init_2=_1;
+      i="New_4";
+      _1=init_2;
+      _2=Equals;
+      _3=Hash;
+    }
+    if(i=="New_4"){
+      const init_3=_1;
+      const equals=_2;
+      const hash=_3;
+      super();
+      this.equals=equals;
+      this.hash=hash;
+      this.data=[];
+      this.count=0;
+      const e=Get(init_3);
+      try {
+        while(e.MoveNext())
+          this.add(e.Current);
+      }
+      finally {
+        const _4=e;
+        if(typeof _4=="object"&&isIDisposable(_4))e.Dispose();
+      }
+    }
+  }
+}
 function Some(Value_1){
   return{$:1, $0:Value_1};
+}
+class Exception extends Object_1 { }
+function LinkElement(el, children){
+  InsertDoc(el, children, null);
 }
 function CreateEmbedNode(){
   return{Current:null, Dirty:false};
@@ -1844,9 +1974,6 @@ function CreateEmbedNode(){
 function UpdateEmbedNode(node, upd){
   node.Current=upd;
   node.Dirty=true;
-}
-function LinkElement(el, children){
-  InsertDoc(el, children, null);
 }
 function InsertDoc(parent, doc, pos){
   while(true)
@@ -2058,131 +2185,6 @@ class DocElemNode {
     return Create_1(DocElemNode, _2);
   }
 }
-let _c_1=Lazy((_i) => class $StartupCode_Templates {
-  static {
-    _c_1=_i(this);
-  }
-  static RenderedFullDocTemplate;
-  static TextHoleRE;
-  static GlobalHoles;
-  static LocalTemplatesLoaded;
-  static LoadedTemplates;
-  static {
-    this.LoadedTemplates=new Dictionary("New_5");
-    this.LocalTemplatesLoaded=false;
-    this.GlobalHoles=new Dictionary("New_5");
-    this.TextHoleRE="\\${([^}]+)}";
-    this.RenderedFullDocTemplate=null;
-  }
-});
-class HashSet extends Object_1 {
-  equals;
-  hash;
-  data;
-  count;
-  SAdd(item){
-    return this.add(item);
-  }
-  Contains(item){
-    const arr=this.data[this.hash(item)];
-    return arr==null?false:this.arrContains(item, arr);
-  }
-  add(item){
-    const h=this.hash(item);
-    const arr=this.data[h];
-    return arr==null?(this.data[h]=[item],this.count=this.count+1,true):this.arrContains(item, arr)?false:(arr.push(item),this.count=this.count+1,true);
-  }
-  arrContains(item, arr){
-    let c=true;
-    let i=0;
-    const l=arr.length;
-    while(c&&i<l)
-      if(this.equals.apply(null, [arr[i], item]))c=false;
-      else i=i+1;
-    return!c;
-  }
-  GetEnumerator(){
-    return Get(concat_3(this.data));
-  }
-  ExceptWith(xs){
-    const e=Get(xs);
-    try {
-      while(e.MoveNext())
-        this.Remove(e.Current);
-    }
-    finally {
-      const _1=e;
-      if(typeof _1=="object"&&isIDisposable(_1))e.Dispose();
-    }
-  }
-  get Count(){
-    return this.count;
-  }
-  IntersectWith(xs){
-    const other=new HashSet("New_4", xs, this.equals, this.hash);
-    const all=concat_3(this.data);
-    for(let i=0, _1=all.length-1;i<=_1;i++){
-      const item=all[i];
-      if(!other.Contains(item))this.Remove(item);
-    }
-  }
-  Remove(item){
-    const arr=this.data[this.hash(item)];
-    return arr==null?false:this.arrRemove(item, arr)&&(this.count=this.count-1,true);
-  }
-  CopyTo(arr, index){
-    const all=concat_3(this.data);
-    for(let i=0, _1=all.length-1;i<=_1;i++)set(arr, i+index, all[i]);
-  }
-  arrRemove(item, arr){
-    let c=true;
-    let i=0;
-    const l=arr.length;
-    while(c&&i<l)
-      if(this.equals.apply(null, [arr[i], item])){
-        arr.splice(i, 1);
-        c=false;
-      }
-      else i=i+1;
-    return!c;
-  }
-  constructor(i, _1, _2, _3){
-    if(i=="New_3"){
-      i="New_4";
-      _1=[];
-      _2=Equals;
-      _3=Hash;
-    }
-    let init_2;
-    if(i=="New_2"){
-      init_2=_1;
-      i="New_4";
-      _1=init_2;
-      _2=Equals;
-      _3=Hash;
-    }
-    if(i=="New_4"){
-      const init_3=_1;
-      const equals=_2;
-      const hash=_3;
-      super();
-      this.equals=equals;
-      this.hash=hash;
-      this.data=[];
-      this.count=0;
-      const e=Get(init_3);
-      try {
-        while(e.MoveNext())
-          this.add(e.Current);
-      }
-      finally {
-        const _4=e;
-        if(typeof _4=="object"&&isIDisposable(_4))e.Dispose();
-      }
-    }
-  }
-}
-class Exception extends Object_1 { }
 let _c_2=Lazy((_i) => class $StartupCode_Abbrev {
   static {
     _c_2=_i(this);
@@ -2360,15 +2362,6 @@ let _c_3=Lazy((_i) => class Client {
     this.FloatApplyChecked=(v) => ApplyValue(g_7, s_7, v);
   }
 });
-function New_1(DynElem, DynFlags, DynNodes, OnAfterRender){
-  const _1={
-    DynElem:DynElem, 
-    DynFlags:DynFlags, 
-    DynNodes:DynNodes
-  };
-  SetOptional(_1, "OnAfterRender", OnAfterRender);
-  return _1;
-}
 class TemplateHole extends Object_1 { }
 function notPresent(){
   throw new KeyNotFoundException("New");
@@ -2623,6 +2616,15 @@ function StartProcessor(procAsync){
     else Equals(m, 1)?st[0]=2:void 0;
   };
 }
+function New_1(DynElem, DynFlags, DynNodes, OnAfterRender){
+  const _1={
+    DynElem:DynElem, 
+    DynFlags:DynFlags, 
+    DynNodes:DynNodes
+  };
+  SetOptional(_1, "OnAfterRender", OnAfterRender);
+  return _1;
+}
 class Updates_1 {
   c;
   s;
@@ -2670,9 +2672,6 @@ class CheckedInput {
   $;
   $0;
   $1;
-}
-function Clear(a){
-  a.splice(0, length(a));
 }
 function New_2(PreviousNodes, Top){
   return{PreviousNodes:PreviousNodes, Top:Top};
@@ -2880,6 +2879,9 @@ let _c_4=Lazy((_i) => class Proxy {
     this.BatchUpdatesEnabled=true;
   }
 });
+function Clear(a){
+  a.splice(0, length(a));
+}
 class DynamicAttrNode extends Object_1 {
   push;
   value;
