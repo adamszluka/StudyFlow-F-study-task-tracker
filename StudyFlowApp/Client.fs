@@ -12,6 +12,12 @@ type Priority =
     | High
 
 [<JavaScript>]
+type Filter =
+    | All
+    | Active
+    | Done
+
+[<JavaScript>]
 type StudyTask =
     {
         Id: int
@@ -33,6 +39,7 @@ let Main () =
     let titleVar = Var.Create ""
     let subjectVar = Var.Create ""
     let priorityVar = Var.Create Medium
+    let filterVar = Var.Create All
 
     let nextIdVar = Var.Create 3
 
@@ -90,11 +97,28 @@ let Main () =
             tasksVar.Value
             |> List.filter (fun t -> t.Id <> taskId)
 
+    let getFilteredTasks tasks =
+        match filterVar.Value with
+        | All -> tasks
+        | Active -> tasks |> List.filter (fun t -> not t.IsDone)
+        | Done -> tasks |> List.filter (fun t -> t.IsDone)
+
     let priorityButton label value =
         button [
             on.click (fun _ _ -> priorityVar.Value <- value)
             attr.style (
                 if priorityVar.Value = value then
+                    "margin-right: 6px; font-weight: bold;"
+                else
+                    "margin-right: 6px;"
+            )
+        ] [ text label ]
+
+    let filterButton label value =
+        button [
+            on.click (fun _ _ -> filterVar.Value <- value)
+            attr.style (
+                if filterVar.Value = value then
                     "margin-right: 6px; font-weight: bold;"
                 else
                     "margin-right: 6px;"
@@ -131,12 +155,20 @@ let Main () =
             ] [ text "Add" ]
         ]
 
+        div [ attr.style "margin-bottom: 20px;" ] [
+            text "Filter: "
+            filterButton "All" All
+            filterButton "Active" Active
+            filterButton "Done" Done
+        ]
+
         h3 [] [ text "Task list" ]
 
         div [] [
             tasksVar.View
             |> Doc.BindView (fun tasks ->
                 tasks
+                |> getFilteredTasks
                 |> List.map (fun t ->
                     div [ attr.style "margin-bottom: 10px;" ] [
                         span [

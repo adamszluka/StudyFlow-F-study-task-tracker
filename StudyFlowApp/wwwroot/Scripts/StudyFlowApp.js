@@ -8,9 +8,11 @@ function Main(){
   const titleVar=_c.Create_1("");
   const subjectVar=_c.Create_1("");
   const priorityVar=_c.Create_1(Medium);
+  const filterVar=_c.Create_1(All);
   const nextIdVar=_c.Create_1(3);
   const tasksVar=_c.Create_1(ofArray([New(1, "Math homework", "Mathematics", High, false), New(2, "F# assignment", "Functional Programming", Medium, false)]));
   const priorityButton=(label, value) => Doc.Element("button", [Attr.HandlerImpl("click", () =>() => priorityVar.Set(value)), Attr.Create("style", Equals(priorityVar.Get(), value)?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode(label)]);
+  const filterButton=(label, value) => Doc.Element("button", [Attr.HandlerImpl("click", () =>() => filterVar.Set(value)), Attr.Create("style", Equals(filterVar.Get(), value)?"margin-right: 6px; font-weight: bold;":"margin-right: 6px;")], [Doc.TextNode(label)]);
   const _1=Doc.Element("div", [], [Doc.Element("h1", [], [Doc.TextNode("StudyFlow")]), Doc.Element("h3", [], [Doc.TextNode("Add new task")]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.Input([Attr.Create("placeholder", "Task title")], titleVar)]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.Input([Attr.Create("placeholder", "Subject")], subjectVar)]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 6px;")], [Doc.TextNode("Priority: "), priorityButton("Low", Low), priorityButton("Medium", Medium), priorityButton("High", High)]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.TextNode("Selected priority: "+priorityToString(priorityVar.Get()))]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 20px;")], [Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
     const title=Trim(titleVar.Get());
     const subject=Trim(subjectVar.Get());
@@ -24,13 +26,18 @@ function Main(){
       return priorityVar.Set(Medium);
     }
     else return null;
-  })], [Doc.TextNode("Add")])]), Doc.Element("h3", [], [Doc.TextNode("Task list")]), Doc.Element("div", [], [Doc.BindView((tasks) => Doc.Concat(map((t) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.Element("span", [Attr.Create("style", t.IsDone?"text-decoration: line-through; margin-right: 10px;":"margin-right: 10px;")], [Doc.TextNode(t.Title+" | "+t.Subject+" | "+priorityToString(t.Priority))]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
-    const taskId=t.Id;
-    return tasksVar.Set(map((t_1) => t_1.Id===taskId?New(t_1.Id, t_1.Title, t_1.Subject, t_1.Priority, !t_1.IsDone):t_1, tasksVar.Get()));
-  }), Attr.Create("style", "margin-right: 6px;")], [Doc.TextNode(t.IsDone?"Undo":"Done")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
-    const taskId=t.Id;
-    return tasksVar.Set(filter((t_1) => t_1.Id!==taskId, tasksVar.Get()));
-  })], [Doc.TextNode("Delete")])]), tasks)), tasksVar.View)])]);
+  })], [Doc.TextNode("Add")])]), Doc.Element("div", [Attr.Create("style", "margin-bottom: 20px;")], [Doc.TextNode("Filter: "), filterButton("All", All), filterButton("Active", Active), filterButton("Done", Done)]), Doc.Element("h3", [], [Doc.TextNode("Task list")]), Doc.Element("div", [], [Doc.BindView((tasks) => {
+    const m=filterVar.Get();
+    let _2=m.$==1?filter((t) =>!t.IsDone, tasks):m.$==2?filter((t) => t.IsDone, tasks):tasks;
+    let _3=map((t) => Doc.Element("div", [Attr.Create("style", "margin-bottom: 10px;")], [Doc.Element("span", [Attr.Create("style", t.IsDone?"text-decoration: line-through; margin-right: 10px;":"margin-right: 10px;")], [Doc.TextNode(t.Title+" | "+t.Subject+" | "+priorityToString(t.Priority))]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
+      const taskId=t.Id;
+      return tasksVar.Set(map((t_1) => t_1.Id===taskId?New(t_1.Id, t_1.Title, t_1.Subject, t_1.Priority, !t_1.IsDone):t_1, tasksVar.Get()));
+    }), Attr.Create("style", "margin-right: 6px;")], [Doc.TextNode(t.IsDone?"Undo":"Done")]), Doc.Element("button", [Attr.HandlerImpl("click", () =>() => {
+      const taskId=t.Id;
+      return tasksVar.Set(filter((t_1) => t_1.Id!==taskId, tasksVar.Get()));
+    })], [Doc.TextNode("Delete")])]), _2);
+    return Doc.Concat(_3);
+  }, tasksVar.View)])]);
   LoadLocalTemplates("");
   Doc.RunById("main", _1);
 }
@@ -57,6 +64,9 @@ let _c=Lazy((_i) => class Var_1 extends Object_1 {
 let Medium={$:1};
 let High={$:2};
 let Low={$:0};
+let All={$:0};
+let Active={$:1};
+let Done={$:2};
 function ofArray(arr){
   let r=FSharpList.Empty;
   for(let i=length(arr)-1, _1=0;i>=_1;i--)r=FSharpList.Cons(get(arr, i), r);
