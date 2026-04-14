@@ -1,33 +1,59 @@
 # StudyFlow
 
-StudyFlow is an F# web application for tracking university subjects, assignments, deadlines and priorities.
+StudyFlow is a simple task management web application built with F# and WebSharper. The goal of the project is to help students manage their study-related tasks, subjects, and priorities in a clear and interactive way.
 
 ## Motivation
 
-As a university student, it is easy to lose track of assignments and deadlines across multiple courses. The goal of this project is to create a simple and practical study task tracker with a clean interface and useful filtering options.
+As a university student, it is often difficult to track assignments, smaller tasks, and deadlines across multiple courses. This project was created to provide a lightweight study task manager with a simple interface and reactive user interactions.
 
-## Planned features
+## Features
 
-- Add subjects
-- Add study tasks
-- Set deadlines
-- Set priorities
-- Mark tasks as completed
-- Filter tasks by subject and status
-- Show simple statistics
+- Add new tasks with title and subject
+- Select task priority: Low, Medium, or High
+- Mark tasks as done or undone
+- Delete tasks
+- Filter tasks by status: All, Active, Done
+- View simple task statistics
 
 ## Technologies
 
 - F#
 - .NET
-- WebSharper / SPA approach
+- WebSharper
+- ASP.NET Core
 
-## Screenshot
+## Functional programming aspects
 
-![StudyFlow Screenshot](Screenshot.png)
+This project uses several functional programming concepts:
+
+- immutable-style record updates
+- discriminated unions for `Priority` and `Filter`
+- list transformations with `List.map` and `List.filter`
+- reactive state handling with `Var` and `View`
+
+## Project Description
+
+As part of my assignment, I developed a web application called StudyFlow using F# and the WebSharper framework. The goal of the project was to create a simple study management interface where users can organize their university-related tasks.
+
+The application allows users to add new tasks, specify the subject, and set a priority level. Tasks can be marked as completed, reverted back to active, or deleted entirely. This provides a flexible and easy-to-use workflow for managing study-related activities.
+
+An important feature of the application is task filtering. Users can display all tasks, only active tasks, or only completed tasks. In addition, the interface includes a simple statistics section that shows the total number of tasks, as well as the number of active and completed ones. These features not only improve usability but also demonstrate list-based operations in practice.
+
+During implementation, several functional programming concepts were applied. Discriminated unions were used to represent priority levels and filtering states, while tasks are modeled using record types. State changes are handled using a reactive approach rather than traditional imperative programming. Task updates are implemented using `List.map` and `List.filter`, and UI reactivity is managed through WebSharper’s `Var` and `View` mechanisms.
+
+Overall, StudyFlow is a simple but extensible application that demonstrates the combined use of F#, functional programming principles, and reactive web development. The project fulfills the course requirements as it represents a real web application with multiple independent features, all implemented using custom logic.
 
 ## Build and run
 
 ```bash
 dotnet build
 dotnet run
+```
+
+## Then open the application in the browser at:
+
+http://localhost:5000
+
+## Screenshot
+
+![StudyFlow Screenshot](Screenshot.png)
