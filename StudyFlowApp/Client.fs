@@ -97,8 +97,8 @@ let Main () =
             tasksVar.Value
             |> List.filter (fun t -> t.Id <> taskId)
 
-    let getFilteredTasks tasks =
-        match filterVar.Value with
+    let getFilteredTasks filter tasks =
+        match filter with
         | All -> tasks
         | Active -> tasks |> List.filter (fun t -> not t.IsDone)
         | Done -> tasks |> List.filter (fun t -> t.IsDone)
@@ -165,10 +165,10 @@ let Main () =
         h3 [] [ text "Task list" ]
 
         div [] [
-            tasksVar.View
-            |> Doc.BindView (fun tasks ->
+            View.Map2 (fun tasks filter -> tasks, filter) tasksVar.View filterVar.View
+            |> Doc.BindView (fun (tasks, filter) ->
                 tasks
-                |> getFilteredTasks
+                |> getFilteredTasks filter
                 |> List.map (fun t ->
                     div [ attr.style "margin-bottom: 10px;" ] [
                         span [
