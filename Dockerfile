@@ -1,6 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y nodejs npm
+
 COPY . ./
 
 RUN dotnet restore ./StudyFlowApp/StudyFlowApp.fsproj
