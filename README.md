@@ -43,6 +43,14 @@ During implementation, several functional programming concepts were applied. Dis
 
 Overall, StudyFlow is a simple but extensible application that demonstrates the combined use of F#, functional programming principles, and reactive web development. The project fulfills the course requirements as it represents a real web application with multiple independent features, all implemented using custom logic.
 
+## How to use
+
+### Clone the repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+```
+
 ## Build and run
 
 ```bash
