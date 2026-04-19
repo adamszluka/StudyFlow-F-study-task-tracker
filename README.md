@@ -90,4 +90,5 @@ The application is deployed using Docker on Render.
 ```bash
 Platform: Render
 Runtime: Docker (.NET 10 + Node.js)
-Live URL: https://studyflow-app-jlri.onrender.com/```
+Live URL: https://studyflow-app-jlri.onrender.com/
+```
