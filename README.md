@@ -72,15 +72,16 @@ Overall, StudyFlow is a simple but extensible application that demonstrates the 
 ```bash
 git clone https://github.com/adamszluka/StudyFlow-F-study-task-tracker.git
 cd StudyFlow-F-study-task-tracker/StudyFlowApp```
-
-
-### Clone the repository
+---
 
 ```bash
 dotnet build
 dotnet run
 Then open:
 http://localhost:5000```
+
+
+---
 
 ### Deployment
 
