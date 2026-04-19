@@ -67,7 +67,7 @@ Overall, StudyFlow is a simple but extensible application that demonstrates the 
 
 ## How to use
 
-### Clone the repository
+## Clone the repository
 
 ```bash
 git clone https://github.com/adamszluka/StudyFlow-F-study-task-tracker.git
@@ -83,7 +83,7 @@ http://localhost:5000```
 
 ---
 
-### Deployment
+## Deployment
 
 The application is deployed using Docker on Render.
 
