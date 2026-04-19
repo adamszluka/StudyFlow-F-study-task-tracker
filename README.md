@@ -92,3 +92,7 @@ Platform: Render
 Runtime: Docker (.NET 10 + Node.js)
 Live URL: https://studyflow-app-jlri.onrender.com/
 ```
+
+## Screenshot
+
+![StudyFlow Screenshot](Screenshot.png)
